@@ -3,22 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Board Game</title>
-    <link rel="stylesheet" href="../static/styles.css">
+    <title>SQL Candy Land Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
 
-    <h1>SQL Learning Board Game</h1>
+    <h1>SQL Candy Land 🍬</h1>
+    <p>Answer SQL questions correctly to move forward!</p>
 
     <div class="board">
         <div id="player">🚀</div>
+        <div class="tiles">
+            <!-- Candy Land styled board spaces -->
+            {% for i in range(10) %}
+                <div class="tile"></div>
+            {% endfor %}
+        </div>
     </div>
 
-    <button onclick="movePlayer('easy')">Answer Easy Question</button>
-    <button onclick="movePlayer('medium')">Answer Medium Question</button>
-    <button onclick="movePlayer('advanced')">Answer Advanced Question</button>
+    <div class="question-box">
+        <p id="question">Click a difficulty to get a question!</p>
+        <input type="text" id="answer" placeholder="Type your SQL query here...">
+        <button onclick="submitAnswer()">Submit</button>
+    </div>
 
-    <script src="../static/script.js"></script>
+    <div class="buttons">
+        <button onclick="getQuestion('easy')">Easy (1 space)</button>
+        <button onclick="getQuestion('medium')">Medium (2 spaces)</button>
+        <button onclick="getQuestion('advanced')">Advanced (3 spaces)</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>
