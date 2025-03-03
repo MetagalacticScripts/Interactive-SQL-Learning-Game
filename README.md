@@ -1,5 +1,8 @@
 # SQL Learning Game
 
+<img width="496" alt="Screenshot 2025-03-03 at 3 24 40 AM" src="https://github.com/user-attachments/assets/a0ad5276-013c-47b9-839d-0a5905c57fa3" />
+
+
 Welcome to the SQL Learning Game! This is an interactive desktop application built with Python and Tkinter to help you learn and practice SQL queries in a fun, gamified way. Test your skills with challenges ranging from basic SELECT statements to advanced JOINs, aggregations, and more – all while earning points and unlocking achievements.
 
 ## Features
