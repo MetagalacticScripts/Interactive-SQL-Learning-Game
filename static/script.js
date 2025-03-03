@@ -1,30 +1,49 @@
 let playerPosition = 0;
+const totalSpaces = 16;
 let hintsLeft = 3;
-let currentQuestion = null;
-let playerIcon = "❓"; // Default before selection
+let playerIcon = "❓";
 
-// Fun SQL Questions
-const sqlQuestions = {
-    easy: [
-        { question: "Find all candy shops in 'Candyland'.", answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';" },
-        { question: "Get all candy ingredients that are 'Rare'.", answer: "SELECT * FROM candy_ingredients WHERE rarity = 'Rare';" }
-    ],
-    medium: [
-        { question: "Get a list of all unique candy ingredient rarities.", answer: "SELECT DISTINCT rarity FROM candy_ingredients;" },
-        { question: "Find the highest-rated candy shops.", answer: "SELECT * FROM candy_shops WHERE rating = 5;" }
-    ],
-    advanced: [
-        { question: "Find candy ingredients and their shop names.", answer: "SELECT candy_ingredients.name, candy_shops.name FROM candy_ingredients JOIN candy_shops ON candy_ingredients.shop_id = candy_shops.id;" }
-    ]
-};
+// Define tile positions for a winding path
+const tilePositions = [
+    [50, 400], [100, 400], [150, 400], [200, 380],
+    [250, 350], [300, 320], [320, 280], [350, 250],
+    [380, 220], [400, 180], [420, 140], [450, 100],
+    [470, 70], [500, 50], [550, 30], [600, 10]
+];
 
-// Character Selection
+// Generate tiles dynamically in a winding path
+function generateTiles() {
+    const tilesContainer = document.getElementById("tiles-container");
+    tilesContainer.innerHTML = "";
+    for (let i = 0; i < totalSpaces; i++) {
+        const tile = document.createElement("div");
+        tile.classList.add("tile");
+        tile.innerText = i === totalSpaces - 1 ? "🏰" : i + 1;
+        tile.style.left = `${tilePositions[i][0]}px`;
+        tile.style.top = `${tilePositions[i][1]}px`;
+        tilesContainer.appendChild(tile);
+    }
+}
+
+// Move player along the predefined path
+function movePlayer(spaces) {
+    playerPosition += spaces;
+    if (playerPosition >= totalSpaces) {
+        alert("🎉 You reached the Candy Castle!");
+        playerPosition = totalSpaces - 1;
+    }
+
+    let [x, y] = tilePositions[playerPosition];
+    document.getElementById("player").style.transform = `translate(${x}px, ${y}px)`;
+}
+
+// Select character icon
 function selectCharacter(icon) {
     playerIcon = icon;
     document.getElementById("player").innerText = icon;
 }
 
-// Display Schema
+// Display schema
 function showSchema() {
     alert(`
     Tables:
@@ -33,12 +52,5 @@ function showSchema() {
     `);
 }
 
-// Movement Animation
-function movePlayer(spaces) {
-    playerPosition += spaces;
-    if (playerPosition >= 16) {
-        alert("🎉 You reached the Candy Castle!");
-        playerPosition = 16;
-    }
-    document.getElementById("player").style.transform = `translate(${(playerPosition % 4) * 65}px, ${(Math.floor(playerPosition / 4)) * 65}px)`;
-}
+// Generate board on load
+window.onload = generateTiles;

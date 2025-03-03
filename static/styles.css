@@ -1,44 +1,63 @@
 body {
     font-family: 'Comic Sans MS', cursive, sans-serif;
     text-align: center;
-    background: linear-gradient(to bottom, #ff9a9e, #fad0c4);
+    background: url('/static/images/background.png') no-repeat center center fixed;
+    background-size: cover;
 }
 
 h1 {
     color: #ff4081;
+    font-size: 36px;
+    text-shadow: 2px 2px #fff;
 }
 
+/* Candy Land Board */
 .board {
-    width: 90%;
-    max-width: 700px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff3e0;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 700px;
+    height: 500px;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
+/* Tile path shaped like Candy Land */
 .tiles {
-    display: grid;
-    grid-template-columns: repeat(4, 60px);
-    grid-template-rows: repeat(4, 60px);
-    gap: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 700px;
+    height: 500px;
+    position: relative;
 }
 
+/* Candy Land tile colors */
 .tile {
     width: 60px;
     height: 60px;
-    border-radius: 10px;
-    background: linear-gradient(45deg, #ff4081, #ffeb3b);
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    position: absolute;
 }
 
+/* Custom Candy Land colors */
+.tile:nth-child(5n+1) { background: #ff6384; } /* Red */
+.tile:nth-child(5n+2) { background: #ffcd56; } /* Yellow */
+.tile:nth-child(5n+3) { background: #36a2eb; } /* Blue */
+.tile:nth-child(5n+4) { background: #4bc0c0; } /* Green */
+.tile:nth-child(5n+5) { background: #ff9f40; } /* Orange */
+
+/* Player icon */
 #player {
     font-size: 30px;
     position: absolute;

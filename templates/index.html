@@ -11,6 +11,7 @@
     <h1>SQL Candy Quest 🍭</h1>
     <p>Answer SQL challenges correctly to reach the Candy Castle! 🏰</p>
 
+    <!-- Character Selection -->
     <div class="character-selection">
         <p>Choose Your Character:</p>
         <button onclick="selectCharacter('🍭')">🍭</button>
@@ -18,13 +19,13 @@
         <button onclick="selectCharacter('🍪')">🍪</button>
     </div>
 
+    <!-- Board Game -->
     <div class="board">
+        <div class="tiles" id="tiles-container"></div>
         <div id="player">❓</div>
-        <div class="tiles" id="tiles-container">
-            <!-- Tiles will be generated here -->
-        </div>
     </div>
 
+    <!-- Question Box -->
     <div class="question-box">
         <p id="question">Click a difficulty to get a question!</p>
         <input type="text" id="answer" placeholder="Type your SQL query here...">
@@ -33,6 +34,7 @@
         <button onclick="showSchema()">📜 Show Database Schema</button>
     </div>
 
+    <!-- Difficulty Selection -->
     <div class="buttons">
         <button onclick="getQuestion('easy')">Easy (1 space)</button>
         <button onclick="getQuestion('medium')">Medium (2 spaces)</button>
