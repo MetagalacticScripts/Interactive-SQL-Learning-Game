@@ -43,3 +43,20 @@ def setup_db():
     # Commit changes
     conn.commit()
     return conn
+
+def get_database_schema():
+    """Return the schema of the database as a string for display in the game."""
+    return """
+    Tables:
+    1. candy_shops
+        - id (INTEGER, PRIMARY KEY)
+        - name (TEXT)
+        - location (TEXT)
+        - rating (INTEGER)
+
+    2. candy_ingredients
+        - id (INTEGER, PRIMARY KEY)
+        - name (TEXT)
+        - rarity (TEXT)
+        - shop_id (INTEGER, FOREIGN KEY -> candy_shops.id)
+    """

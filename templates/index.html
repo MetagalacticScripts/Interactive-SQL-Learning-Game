@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Candy Land Game</title>
+    <title>SQL Candy Quest 🍬</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
 
-    <h1>SQL Candy Land 🍬</h1>
-    <p>Answer SQL questions correctly to move forward!</p>
+    <h1>SQL Candy Quest 🍭</h1>
+    <p>Answer SQL challenges correctly to reach the Candy Castle! 🏰</p>
+
+    <div class="character-selection">
+        <p>Choose Your Character:</p>
+        <button onclick="selectCharacter('🍭')">🍭</button>
+        <button onclick="selectCharacter('🍫')">🍫</button>
+        <button onclick="selectCharacter('🍪')">🍪</button>
+    </div>
 
     <div class="board">
-        <div id="player">🚀</div>
-        <div class="tiles">
-            <!-- Candy Land styled board spaces -->
-            {% for i in range(10) %}
-                <div class="tile"></div>
-            {% endfor %}
+        <div id="player">❓</div>
+        <div class="tiles" id="tiles-container">
+            <!-- Tiles will be generated here -->
         </div>
     </div>
 
@@ -25,6 +29,8 @@
         <p id="question">Click a difficulty to get a question!</p>
         <input type="text" id="answer" placeholder="Type your SQL query here...">
         <button onclick="submitAnswer()">Submit</button>
+        <button onclick="getHint()">💡 Hint (<span id="hints">3</span> left)</button>
+        <button onclick="showSchema()">📜 Show Database Schema</button>
     </div>
 
     <div class="buttons">
