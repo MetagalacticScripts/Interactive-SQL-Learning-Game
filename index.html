@@ -202,6 +202,8 @@
       box-shadow: 0 1vh 4vh rgba(0, 0, 0, 0.2);
       z-index: 1000;
       animation: popIn 0.3s ease-out;
+      overflow-y: auto;
+      max-height: 80vh;
     }
     @keyframes popIn {
       from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
@@ -213,6 +215,7 @@
       padding: 1.5vh;
       border-radius: 0.5vh;
       position: relative;
+      overflow-x: hidden;
     }
     .popup h2 {
       color: #4A90E2;
@@ -235,6 +238,9 @@
       user-select: text;
       direction: ltr;
       white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 20vh; /* Limit height to prevent overflow */
+      overflow-y: auto; /* Add scrollbar if content exceeds */
     }
     #answer[contenteditable]:empty:before {
       content: attr(placeholder);
@@ -522,214 +528,169 @@
       ]
     };
 
-    function executeQuery(query, outerRow = null) {
-      try {
-        const tables = {
-          'candy_shops': mockDatabase.candy_shops,
-          'products': mockDatabase.products,
-          'sales': mockDatabase.sales
-        };
+function executeQuery(query, outerRow = null) {
+  try {
+    const tables = {
+      'candy_shops': mockDatabase.candy_shops,
+      'products': mockDatabase.products,
+      'sales': mockDatabase.sales
+    };
 
-        const keywords = query.toUpperCase().match(/\b(SELECT|FROM|WHERE|JOIN|GROUP|BY|HAVING|ORDER|LIMIT|NOT|IN|AND|OR|AS|SUM|AVG|COUNT|DISTINCT)\b/g) || [];
-        if (!keywords.includes('SELECT') || !keywords.includes('FROM')) {
-          return { error: "Invalid SQL query: Missing SELECT or FROM clause." };
+    const keywords = query.toUpperCase().match(/\b(SELECT|FROM|WHERE|JOIN|GROUP|BY|HAVING|ORDER|LIMIT|NOT|IN|AND|OR|AS|SUM|AVG|COUNT|DISTINCT)\b/g) || [];
+    if (!keywords.includes('SELECT') || !keywords.includes('FROM')) {
+      return { error: "Invalid SQL query: Missing SELECT or FROM clause." };
+    }
+
+    // Extract table name
+    const fromMatch = query.match(/FROM\s+(\w+)/i);
+    if (!fromMatch) return { error: "Invalid SQL query: No FROM clause." };
+    const tableName = fromMatch[1];
+    let result = [...(tables[tableName] || [])];
+
+    // Handle JOIN
+    const joinMatch = query.match(/JOIN\s+(\w+)\s+ON\s+(.+)/i);
+    if (joinMatch) {
+      const joinTable = joinMatch[1];
+      const joinCondition = joinMatch[2];
+      const [leftCol, rightCol] = joinCondition.split('=').map(col => col.trim());
+      result = result.flatMap(row =>
+        tables[joinTable].filter(joinRow =>
+          eval(`row.${leftCol.split('.')[1]} === joinRow.${rightCol.split('.')[1]}`)
+        ).map(joinRow => ({ ...row, ...joinRow }))
+      );
+    }
+
+    // Handle WHERE
+    const whereMatch = query.match(/WHERE\s+(.+)/i);
+    if (whereMatch) {
+      const condition = whereMatch[1].replace(/'([^']+)'/g, (match, p1) => `"${p1}"`);
+      result = result.filter(row => {
+        try {
+          return eval(condition.replace(/(\w+)\.(\w+)/g, 'row.$2'));
+        } catch (e) {
+          return false;
         }
+      });
+    }
 
-        let result = [...tables[query.match(/FROM\s+(\w+)/i)[1]] || []];
+    // Handle GROUP BY and aggregation
+    const groupByMatch = query.match(/GROUP\s+BY\s+(.+)/i);
+    if (groupByMatch) {
+      const groupByCols = groupByMatch[1].split(',').map(col => col.trim().split('.')[1]);
+      const havingMatch = query.match(/HAVING\s+(.+)/i);
+      const grouped = {};
+      result.forEach(row => {
+        const key = groupByCols.map(col => row[col]).join('|');
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(row);
+      });
+      result = Object.values(grouped).map(group => {
+        const aggRow = {};
+        groupByCols.forEach(col => aggRow[col] = group[0][col]);
+        return aggRow;
+      });
 
-        // Handle JOIN
-        const joinMatch = query.match(/JOIN\s+(\w+)\s+ON\s+(.+)/i);
-        if (joinMatch) {
-          const joinTable = joinMatch[1];
-          const joinCondition = joinMatch[2];
-          const [leftCol, rightCol] = joinCondition.split('=').map(col => col.trim());
-          result = result.flatMap(row =>
-            tables[joinTable].filter(joinRow =>
-              eval(`row.${leftCol.split('.')[1]} === joinRow.${rightCol.split('.')[1]}`)
-            ).map(joinRow => ({ ...row, ...joinRow }))
-          );
-        }
+      const selectMatch = query.match(/SELECT\s+(.+?)(?:\s+FROM|\s+WHERE|\s+GROUP|\s+$)/i);
+      if (selectMatch) {
+        const selectClause = selectMatch[1].split(',').map(col => col.trim());
+        selectClause.forEach(col => {
+          const match = col.match(/(\w+)\((.+)\)/);
+          if (match) {
+            const aggFunc = match[1].toLowerCase();
+            const aggCol = match[2].split('.')[1];
+            result = result.map((row, index) => {
+              const group = Object.values(grouped).filter(g => groupByCols.every(col => g[0][col] === row[col]))[0] || [];
+              let value;
+              switch (aggFunc) {
+                case 'sum':
+                  value = group.reduce((sum, r) => sum + (r[aggCol] || 0), 0);
+                  break;
+                case 'avg':
+                  value = group.reduce((sum, r) => sum + (r[aggCol] || 0), 0) / group.length;
+                  break;
+                case 'count':
+                  value = group.length;
+                  break;
+                case 'max':
+                  value = Math.max(...group.map(r => r[aggCol] || -Infinity));
+                  break;
+                case 'min':
+                  value = Math.min(...group.map(r => r[aggCol] || Infinity));
+                  break;
+              }
+              return { ...row, [col]: value };
+            });
+          }
+        });
 
-        // Handle WHERE
-        const whereMatch = query.match(/WHERE\s+(.+)/i);
-        if (whereMatch) {
-          const condition = whereMatch[1].replace(/'([^']+)'/g, (match, p1) => `"${p1}"`);
+        if (havingMatch) {
+          const havingCondition = havingMatch[1].replace(/'([^']+)'/g, (match, p1) => `"${p1}"`);
           result = result.filter(row => {
             try {
-              return eval(condition.replace(/(\w+)\.(\w+)/g, 'row.$2'));
+              return eval(havingCondition);
             } catch (e) {
+              console.error("HAVING evaluation error:", e);
               return false;
             }
           });
         }
-
-        // Handle GROUP BY and aggregation
-        const groupByMatch = query.match(/GROUP\s+BY\s+(.+)/i);
-        if (groupByMatch) {
-          const groupByCols = groupByMatch[1].split(',').map(col => col.trim().split('.')[1]);
-          const havingMatch = query.match(/HAVING\s+(.+)/i);
-          const grouped = {};
-          result.forEach(row => {
-            const key = groupByCols.map(col => row[col]).join('|');
-            if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(row);
-          });
-          result = Object.values(grouped).map(group => {
-            const aggRow = {};
-            groupByCols.forEach(col => aggRow[col] = group[0][col]);
-            return aggRow;
-          });
-
-          const selectMatch = query.match(/SELECT\s+(.+?)(?:\s+FROM|\s+WHERE|\s+GROUP|\s+$)/i);
-          if (selectMatch) {
-            const selectClause = selectMatch[1].split(',').map(col => col.trim());
-            selectClause.forEach(col => {
-              const match = col.match(/(\w+)\((.+)\)/);
-              if (match) {
-                const aggFunc = match[1].toLowerCase();
-                const aggCol = match[2].split('.')[1];
-                result = result.map((row, index) => {
-                  const group = grouped[Object.values(row).join('|')];
-                  let value;
-                  switch (aggFunc) {
-                    case 'sum':
-                      value = group.reduce((sum, r) => sum + (r[aggCol] || 0), 0);
-                      break;
-                    case 'avg':
-                      value = group.reduce((sum, r) => sum + (r[aggCol] || 0), 0) / group.length;
-                      break;
-                    case 'count':
-                      value = group.length;
-                      break;
-                    case 'max':
-                      value = Math.max(...group.map(r => r[aggCol] || -Infinity));
-                      break;
-                    case 'min':
-                      value = Math.min(...group.map(r => r[aggCol] || Infinity));
-                      break;
-                  }
-                  return { ...row, [col]: value };
-                });
-              }
-            });
-          }
-
-          if (havingMatch) {
-            const havingCondition = havingMatch[1].replace(/'([^']+)'/g, (match, p1) => `"${p1}"`);
-            // Handle correlated subquery in HAVING
-            result = result.filter(row => {
-              try {
-                const subqueryMatch = havingCondition.match(/\(\s*SELECT\s+(.+?)\s+FROM\s+(\w+)\s*(?:JOIN\s+(\w+)\s+ON\s+(.+))?\s*(WHERE\s+(.+))?\s*(GROUP\s+BY\s+(.+))?\)/i);
-                if (subqueryMatch) {
-                  const [, subSelect, subFrom, subJoinTable, subJoinCondition, subWhere, subGroupBy] = subqueryMatch;
-                  let subResult = [...tables[subFrom] || []];
-                  if (subJoinTable && subJoinCondition) {
-                    const [leftCol, rightCol] = subJoinCondition.split('=').map(col => col.trim());
-                    subResult = subResult.flatMap(subRow =>
-                      tables[subJoinTable].filter(joinRow =>
-                        eval(`subRow.${leftCol.split('.')[1]} === joinRow.${rightCol.split('.')[1]}`)
-                      ).map(joinRow => ({ ...subRow, ...joinRow }))
-                    );
-                  }
-                  if (subWhere) {
-                    const subCondition = subWhere.replace(/'([^']+)'/g, (match, p1) => `"${p1}"`).replace(/cs\.shop_id/g, `"${row['shop_id']}"`);
-                    subResult = subResult.filter(subRow => eval(subCondition));
-                  }
-                  if (subGroupBy) {
-                    const subGroupByCols = subGroupBy.split(',').map(col => col.trim().split('.')[1]);
-                    const subGrouped = {};
-                    subResult.forEach(subRow => {
-                      const key = subGroupByCols.map(col => subRow[col]).join('|');
-                      if (!subGrouped[key]) subGrouped[key] = [];
-                      subGrouped[key].push(subRow);
-                    });
-                    subResult = Object.values(subGrouped).map(group => {
-                      const subAggRow = {};
-                      subGroupByCols.forEach(col => subAggRow[col] = group[0][col]);
-                      return subAggRow;
-                    });
-                    const subSelectClause = subSelect.split(',').map(col => col.trim());
-                    subSelectClause.forEach(col => {
-                      const match = col.match(/(\w+)\((.+)\)/);
-                      if (match) {
-                        const aggFunc = match[1].toLowerCase();
-                        const aggCol = match[2].split('.')[1];
-                        let value;
-                        switch (aggFunc) {
-                          case 'avg':
-                            value = subResult.reduce((sum, r) => sum + (r[aggCol] || 0), 0) / subResult.length;
-                            break;
-                        }
-                        return value !== undefined ? value : null;
-                      }
-                    });
-                    const subValue = subResult.length > 0 ? eval(subSelect) : null;
-                    return eval(havingCondition.replace(/\(\s*SELECT\s+(.+?)\s+FROM\s+(\w+)\s*(?:JOIN\s+(\w+)\s+ON\s+(.+))?\s*(WHERE\s+(.+))?\s*(GROUP\s+BY\s+(.+))?\)/i, `"${subValue}"`));
-                  }
-                }
-                return eval(havingCondition);
-              } catch (e) {
-                console.error("HAVING evaluation error:", e);
-                return false;
-              }
-            });
-          }
-        }
-
-        // Handle ORDER BY
-        const orderByMatch = query.match(/ORDER\s+BY\s+(.+)/i);
-        if (orderByMatch) {
-          const orderByCols = orderByMatch[1].split(',').map(col => {
-            const [colName, dir] = col.trim().split(' ');
-            return { col: colName.split('.')[1], dir: dir || 'ASC' };
-          });
-          result.sort((a, b) => {
-            for (let { col, dir } of orderByCols) {
-              if (a[col] < b[col]) return dir.toUpperCase() === 'ASC' ? -1 : 1;
-              if (a[col] > b[col]) return dir.toUpperCase() === 'ASC' ? 1 : -1;
-            }
-            return 0;
-          });
-        }
-
-        // Handle LIMIT
-        const limitMatch = query.match(/LIMIT\s+(\d+)/i);
-        if (limitMatch) {
-          const limit = parseInt(limitMatch[1]);
-          result = result.slice(0, limit);
-        }
-
-        // Extract selected columns
-        const selectMatch = query.match(/SELECT\s+(.+?)(?:\s+FROM|\s+WHERE|\s+GROUP|\s+$)/i);
-        let columns = [];
-        if (selectMatch) {
-          columns = selectMatch[1].split(',').map(col => {
-            const match = col.trim().match(/(\w+)\((.+)\)/);
-            return match ? `${match[1]}(${match[2].split('.')[1]})` : col.trim().split('.')[1] || '*';
-          });
-        }
-        if (columns[0] === '*') {
-          columns = Object.keys(result[0] || {});
-        } else {
-          result = result.map(row => {
-            const newRow = {};
-            columns.forEach(col => {
-              const match = col.match(/(\w+)\((.+)\)/);
-              if (match) {
-                newRow[col] = row[col];
-              } else {
-                newRow[col] = row[col];
-              }
-            });
-            return newRow;
-          });
-        }
-
-        return { columns, rows: result };
-      } catch (e) {
-        return { error: `Query execution failed: ${e.message}` };
       }
     }
+
+    // Handle ORDER BY
+    const orderByMatch = query.match(/ORDER\s+BY\s+(.+)/i);
+    if (orderByMatch) {
+      const orderByCols = orderByMatch[1].split(',').map(col => {
+        const [colName, dir] = col.trim().split(' ');
+        return { col: colName.split('.')[1], dir: dir || 'ASC' };
+      });
+      result.sort((a, b) => {
+        for (let { col, dir } of orderByCols) {
+          if (a[col] < b[col]) return dir.toUpperCase() === 'ASC' ? -1 : 1;
+          if (a[col] > b[col]) return dir.toUpperCase() === 'ASC' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    // Handle LIMIT
+    const limitMatch = query.match(/LIMIT\s+(\d+)/i);
+    if (limitMatch) {
+      const limit = parseInt(limitMatch[1]);
+      result = result.slice(0, limit);
+    }
+
+    // Extract selected columns
+    const selectMatch = query.match(/SELECT\s+(.+?)(?:\s+FROM|\s+WHERE|\s+GROUP|\s+$)/i);
+    let columns = [];
+    if (selectMatch) {
+      columns = selectMatch[1].split(',').map(col => {
+        const match = col.trim().match(/(\w+)\((.+)\)/);
+        return match ? `${match[1]}(${match[2].split('.')[1]})` : col.trim().split('.')[1] || '*';
+      });
+    }
+    if (columns.includes('*') || columns.length === 0) {
+      columns = Object.keys(result[0] || mockDatabase[tableName][0] || {});
+    } else {
+      result = result.map(row => {
+        const newRow = {};
+        columns.forEach(col => {
+          const match = col.match(/(\w+)\((.+)\)/);
+          if (match) {
+            newRow[col] = row[col];
+          } else {
+            newRow[col] = row[col];
+          }
+        });
+        return newRow;
+      });
+    }
+
+    return { columns, rows: result };
+  } catch (e) {
+    return { error: `Query execution failed: ${e.message}` };
+  }
+}
 
     window.onload = () => {
       generateTilePositions();
