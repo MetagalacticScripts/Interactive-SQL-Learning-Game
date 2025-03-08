@@ -108,7 +108,7 @@
        Player
        ======================= */
     #player {
-      font-size: 60px; /* bigger icon */
+      font-size: 80px; /* bigger icon */
       position: absolute;
       transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
       z-index: 10;
@@ -139,7 +139,7 @@
     }
 
     /* =======================
-       Popup
+       Popup for Questions
        ======================= */
     .popup {
       display: none;
@@ -159,6 +159,7 @@
       border: 5px solid #ff80ab;
       padding: 20px;
       border-radius: 15px;
+      position: relative; /* so close button can be positioned */
     }
     .popup h2 {
       color: #ff4081;
@@ -185,6 +186,66 @@
       transition: background 0.3s;
     }
     .popup-buttons button:hover {
+      background: #36a2eb;
+    }
+    /* Close (X) Button inside the popup */
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #888;
+      transition: color 0.3s;
+    }
+    .close-button:hover {
+      color: #ff4081;
+    }
+
+    /* =======================
+       Custom Message Popup
+       ======================= */
+    .message-popup {
+      display: none;
+      position: fixed;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 5px solid #ff80ab;
+      border-radius: 20px;
+      width: 400px;
+      padding: 20px;
+      z-index: 2000;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+    .message-popup-content {
+      position: relative;
+      padding: 20px;
+      font-size: 18px;
+    }
+    .message-popup .close-button {
+      top: 10px;
+      right: 15px;
+    }
+    .message-popup p {
+      margin: 0;
+      padding: 10px 0;
+      color: #555;
+    }
+    .ok-button {
+      background: #bae1ff;
+      color: #333;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    .ok-button:hover {
       background: #36a2eb;
     }
   </style>
@@ -220,6 +281,8 @@
   <!-- Popup for Questions -->
   <div id="question-popup" class="popup">
     <div class="popup-content">
+      <!-- Close Button -->
+      <button class="close-button" onclick="closePopup()">×</button>
       <h2>Sweet Challenge 🍬</h2>
       <p id="question-text"></p>
       <input type="text" id="answer" placeholder="Type your SQL query here...">
@@ -232,6 +295,15 @@
     </div>
   </div>
 
+  <!-- Custom Message Popup (replaces alerts) -->
+  <div id="message-popup" class="message-popup">
+    <div class="message-popup-content">
+      <button class="close-button" onclick="closeMessagePopup()">×</button>
+      <p id="message-text"></p>
+      <button class="ok-button" onclick="closeMessagePopup()">OK</button>
+    </div>
+  </div>
+
   <script>
     /* ========================================
        GLOBAL VARIABLES & INITIAL SETUP
@@ -241,19 +313,25 @@
     let hintsLeft = 3;
     let playerIcon = "🍭"; // Default
 
+    /* We'll track how many spaces to move based on difficulty. */
+    let spacesToMove = 1;
+
     /* Adjust for bigger board */
     const tileSize = 100;
     const tileSpacing = 120;
 
     const tilePositions = [];
 
-    /* Generate tile positions in a 5-column layout */
+    // Generate tile positions in a 5-column layout
     for (let i = 0; i < totalSpaces; i++) {
       let x = 100 + (i % 5) * tileSpacing;
       let y = 100 + Math.floor(i / 5) * tileSpacing;
       tilePositions.push([x, y]);
     }
 
+    /* ========================================
+       GENERATE TILES
+    ======================================= */
     function generateTiles() {
       const tilesContainer = document.getElementById("tiles-container");
       tilesContainer.innerHTML = "";
@@ -276,10 +354,12 @@
         tilesContainer.appendChild(tile);
       }
 
-      // Place player on the start tile
       resetPlayer();
     }
 
+    /* ========================================
+       MOVE PLAYER
+    ======================================= */
     function movePlayer(spaces) {
       playerPosition = Math.min(playerPosition + spaces, totalSpaces - 1);
       const [x, y] = tilePositions[playerPosition];
@@ -289,11 +369,14 @@
 
       // Reached the Candy Castle?
       if (playerPosition === totalSpaces - 1) {
-        alert("🎉 Congratulations! You've reached the Candy Castle!");
+        showMessage("🎉 Congratulations! You've reached the Candy Castle!");
         resetPlayer();
       }
     }
 
+    /* ========================================
+       RESET PLAYER
+    ======================================= */
     function resetPlayer() {
       playerPosition = 0;
       hintsLeft = 3;
@@ -303,8 +386,15 @@
       const player = document.getElementById("player");
       player.style.left = `${x}px`;
       player.style.top = `${y}px`;
+
+      // Also close any open popups
+      closePopup();
+      closeMessagePopup();
     }
 
+    /* ========================================
+       CHARACTER SELECTION
+    ======================================= */
     function selectCharacter(icon) {
       playerIcon = icon;
       document.getElementById("player").innerText = icon;
@@ -315,6 +405,7 @@
        SQL CHALLENGES
     ======================================= */
     let currentQuestion = null;
+
     const sqlQuestions = {
       easy: [
         {
@@ -348,55 +439,107 @@
       ]
     };
 
+    /* Get question for chosen difficulty, set how many spaces to move. */
     function getQuestion(difficulty) {
+      switch(difficulty) {
+        case 'easy':
+          spacesToMove = 1;
+          break;
+        case 'medium':
+          spacesToMove = 2;
+          break;
+        case 'advanced':
+          spacesToMove = 3;
+          break;
+      }
       const questionList = sqlQuestions[difficulty];
       currentQuestion = questionList[Math.floor(Math.random() * questionList.length)];
 
+      // Show question in popup
       document.getElementById("question-text").innerText = currentQuestion.question;
       document.getElementById("answer").value = "";
       document.getElementById("question-popup").style.display = "block";
     }
 
+    /* ========================================
+       QUESTION SUBMISSION
+    ======================================= */
     function submitAnswer() {
+      if (!currentQuestion) {
+        showMessage("No question is active right now.");
+        return;
+      }
       const userAnswer = document.getElementById("answer").value.trim();
+
       if (userAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
-        alert("🎉 Correct! Moving forward.");
-        movePlayer(1);
-        document.getElementById("question-popup").style.display = "none";
+        closePopup();
+        showMessage("🎉 Correct! Moving forward.");
+        movePlayer(spacesToMove);
         currentQuestion = null;
       } else {
-        alert("❌ Incorrect! Try again.");
+        showMessage("❌ Incorrect! Try again.");
       }
     }
 
+    /* ========================================
+       HINT & SCHEMA
+    ======================================= */
     function showHint() {
       if (hintsLeft > 0 && currentQuestion) {
         const keyCondition = currentQuestion.question.split("'")[1] || "the key condition";
-        alert(`Hint: Think about filtering with WHERE on '${keyCondition}'.`);
+        showMessage(`Hint: Think about filtering with WHERE on '${keyCondition}'.`);
         hintsLeft--;
         document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
       } else {
-        alert("No hints left!");
+        showMessage("No hints left or no active question!");
       }
     }
 
     function showDatabaseSchema() {
-      alert(
+      showMessage(
         "Tables:\n" +
         "1. candy_shops - id, name, location, rating\n" +
         "2. candy_ingredients - id, name, rarity, shop_id"
       );
     }
 
+    /* ========================================
+       SHOW ANSWER & CLOSE QUESTION
+    ======================================= */
     function showAnswer() {
       if (currentQuestion) {
-        alert(
+        showMessage(
           `Answer: ${currentQuestion.answer}\n\n` +
           "Explanation: This query retrieves the requested data using SQL filtering and joins as needed."
         );
+        // Immediately close the question popup
+        closePopup();
+        // Mark the question as finished
+        currentQuestion = null;
       }
     }
 
+    /* ========================================
+       CUSTOM POPUP CONTROLS
+    ======================================= */
+    function closePopup() {
+      document.getElementById("question-popup").style.display = "none";
+    }
+
+    /* ========================================
+       CUSTOM MESSAGE POPUP (REPLACES ALERT)
+    ======================================= */
+    function showMessage(msg) {
+      document.getElementById("message-text").innerText = msg;
+      document.getElementById("message-popup").style.display = "block";
+    }
+    function closeMessagePopup() {
+      document.getElementById("message-popup").style.display = "none";
+    }
+
+    /* ========================================
+       ON WINDOW LOAD
+    ======================================= */
     window.onload = () => {
       generateTiles();
     };
