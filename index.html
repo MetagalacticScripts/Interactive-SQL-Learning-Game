@@ -103,7 +103,7 @@
     }
     .board {
       width: clamp(80vw, 90vw, 70vw);
-      height: clamp(40vh, 50vh, 60vh);
+      height: clamp(40vh, 50vh, 80vh); /* Increased to fit all 20 tiles */
       background: #FFFFFF;
       margin: 1vh 0;
       border-radius: 1vh;
@@ -297,14 +297,14 @@
       }
       .board {
         width: 70vw;
-        height: 60vh;
+        height: 80vh; /* Adjusted to fit all 20 tiles in a 5x4 grid */
       }
       .progress-bar {
         width: 70vw;
       }
       .tiles {
-        grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr); /* Explicit 5 columns */
+        grid-template-rows: repeat(4, 1fr);    /* Explicit 4 rows for 20 tiles */
         gap: 1vh;
       }
       .tile {
@@ -322,6 +322,16 @@
       .controls {
         flex-wrap: nowrap;
       }
+    }
+    .sql-keyword {
+      color: #C71585;
+      font-weight: bold;
+    }
+    .sql-string {
+      color: #32CD32;
+    }
+    .sql-number {
+      color: #FF4500;
     }
   </style>
 </head>
@@ -419,155 +429,58 @@
 
     const sqlQuestions = {
       easy: [
-        { question: "Find all candy shops in 'Candyland'.", answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';" },
-        { question: "List all products with a price less than $5.", answer: "SELECT * FROM products WHERE price < 5;" },
-        { question: "Get all sales from '2025-01-01'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-01-01';" },
-        { question: "Select all products with stock quantity above 100.", answer: "SELECT * FROM products WHERE stock_quantity > 100;" },
-        { question: "List shops with a rating of 4 or higher.", answer: "SELECT * FROM candy_shops WHERE rating >= 4;" },
-        { question: "Get all products in the 'Chocolate' category.", answer: "SELECT * FROM products WHERE category = 'Chocolate';" },
-        { question: "Find sales with quantity sold greater than 10.", answer: "SELECT * FROM sales WHERE quantity_sold > 10;" },
-        { question: "List products priced exactly $2.50.", answer: "SELECT * FROM products WHERE price = 2.50;" },
-        { question: "Select shops with rating exactly 5.", answer: "SELECT * FROM candy_shops WHERE rating = 5;" },
-        { question: "Get sales with total amount over $50.", answer: "SELECT * FROM sales WHERE total_amount > 50;" },
-        { question: "Find shops in 'Sugarville'.", answer: "SELECT * FROM candy_shops WHERE location = 'Sugarville';" },
-        { question: "List products with category 'Gummy'.", answer: "SELECT * FROM products WHERE category = 'Gummy';" },
-        { question: "Get products with stock quantity of 0.", answer: "SELECT * FROM products WHERE stock_quantity = 0;" },
-        { question: "Select sales with quantity sold of 1.", answer: "SELECT * FROM sales WHERE quantity_sold = 1;" },
-        { question: "Find shops with rating below 3.", answer: "SELECT * FROM candy_shops WHERE rating < 3;" },
-        { question: "List products priced between $1 and $3.", answer: "SELECT * FROM products WHERE price BETWEEN 1 AND 3;" },
-        { question: "Get sales from '2025-03-07'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-03-07';" },
-        { question: "Find products with price greater than $10.", answer: "SELECT * FROM products WHERE price > 10;" },
-        { question: "List shops with shop_name starting with 'Candy'.", answer: "SELECT * FROM candy_shops WHERE shop_name LIKE 'Candy%';" },
-        { question: "Get products with category 'Hard Candy'.", answer: "SELECT * FROM products WHERE category = 'Hard Candy';" },
-        { question: "Select sales with total amount less than $10.", answer: "SELECT * FROM sales WHERE total_amount < 10;" },
-        { question: "Find products with stock quantity below 50.", answer: "SELECT * FROM products WHERE stock_quantity < 50;" },
-        { question: "List shops in 'Sweet Town'.", answer: "SELECT * FROM candy_shops WHERE location = 'Sweet Town';" },
-        { question: "Get products priced under $1.", answer: "SELECT * FROM products WHERE price < 1;" },
-        { question: "Select sales from the last week.", answer: "SELECT * FROM sales WHERE sale_date > DATE_SUB(CURDATE(), INTERVAL 7 DAY);" },
-        { question: "Find shops with rating of 3.", answer: "SELECT * FROM candy_shops WHERE rating = 3;" },
-        { question: "List products with no stock.", answer: "SELECT * FROM products WHERE stock_quantity = 0;" },
-        { question: "Get sales with quantity sold between 5 and 10.", answer: "SELECT * FROM sales WHERE quantity_sold BETWEEN 5 AND 10;" },
-        { question: "Find products in 'Lollipop' category.", answer: "SELECT * FROM products WHERE category = 'Lollipop';" },
-        { question: "List shops with location 'Candy City'.", answer: "SELECT * FROM candy_shops WHERE location = 'Candy City';" },
-        { question: "Get products with price exactly $5.", answer: "SELECT * FROM products WHERE price = 5;" },
-        { question: "Select sales with total amount exactly $20.", answer: "SELECT * FROM sales WHERE total_amount = 20;" },
-        { question: "Find shops with shop_name containing 'Sweet'.", answer: "SELECT * FROM candy_shops WHERE shop_name LIKE '%Sweet%';" },
-        { question: "List products with stock quantity over 200.", answer: "SELECT * FROM products WHERE stock_quantity > 200;" },
-        { question: "Get sales from '2024-12-31'.", answer: "SELECT * FROM sales WHERE sale_date = '2024-12-31';" },
-        { question: "Find products with category 'Caramel'.", answer: "SELECT * FROM products WHERE category = 'Caramel';" },
-        { question: "List shops with rating above 2.", answer: "SELECT * FROM candy_shops WHERE rating > 2;" },
-        { question: "Get sales with quantity sold less than 3.", answer: "SELECT * FROM sales WHERE quantity_sold < 3;" },
-        { question: "Find products priced at $7.99.", answer: "SELECT * FROM products WHERE price = 7.99;" },
-        { question: "List shops in 'Choco Land'.", answer: "SELECT * FROM candy_shops WHERE location = 'Choco Land';" },
-        { question: "Get products with stock quantity exactly 100.", answer: "SELECT * FROM products WHERE stock_quantity = 100;" },
-        { question: "Select sales with total amount over $100.", answer: "SELECT * FROM sales WHERE total_amount > 100;" },
-        { question: "Find shops with rating below 4.", answer: "SELECT * FROM candy_shops WHERE rating < 4;" },
-        { question: "List products in 'Jelly' category.", answer: "SELECT * FROM products WHERE category = 'Jelly';" },
-        { question: "Get sales from '2025-02-14'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-02-14';" },
-        { question: "Find products with price less than $2.", answer: "SELECT * FROM products WHERE price < 2;" },
-        { question: "List shops with shop_name ending in 'Shop'.", answer: "SELECT * FROM candy_shops WHERE shop_name LIKE '%Shop';" },
-        { question: "Get products with stock quantity below 10.", answer: "SELECT * FROM products WHERE stock_quantity < 10;" },
-        { question: "Select sales with quantity sold over 20.", answer: "SELECT * FROM sales WHERE quantity_sold > 20;" },
-        { question: "Find shops in 'Gummyville'.", answer: "SELECT * FROM candy_shops WHERE location = 'Gummyville';" }
+        { question: "Find all candy shops in 'Candyland'.", answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';", result: { columns: ['shop_id', 'shop_name', 'location', 'rating'], rows: [{ shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 }] } },
+        { question: "List all products with a price less than $5.", answer: "SELECT * FROM products WHERE price < 5;", result: { columns: ['product_id', 'product_name', 'category', 'price', 'stock_quantity'], rows: [
+          { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
+          { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 },
+          { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 },
+          { product_id: 4, product_name: "Hard Candy", category: "Hard Candy", price: 0.50, stock_quantity: 100 },
+          { product_id: 5, product_name: "Caramel Chew", category: "Caramel", price: 1.25, stock_quantity: 75 }
+        ]} },
+        { question: "Get all sales from '2025-03-01'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-03-01';", result: { columns: ['sale_id', 'shop_id', 'product_id', 'sale_date', 'quantity_sold', 'total_amount'], rows: [{ sale_id: 1, shop_id: 1, product_id: 1, sale_date: "2025-03-01", quantity_sold: 10, total_amount: 15.00 }] } },
+        { question: "Select all products with stock quantity above 100.", answer: "SELECT * FROM products WHERE stock_quantity > 100;", result: { columns: ['product_id', 'product_name', 'category', 'price', 'stock_quantity'], rows: [
+          { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
+          { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 },
+          { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 }
+        ]} },
+        { question: "List shops with a rating of 4 or higher.", answer: "SELECT * FROM candy_shops WHERE rating >= 4;", result: { columns: ['shop_id', 'shop_name', 'location', 'rating'], rows: [
+          { shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 },
+          { shop_id: 3, shop_name: "Choco Bliss", location: "Choco Land", rating: 4.9 },
+          { shop_id: 5, shop_name: "Sweet Shop", location: "Sweet Town", rating: 4.0 }
+        ]} }
       ],
       medium: [
-        { question: "Find total quantity sold per product.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name;" },
-        { question: "List shops and their total sales amount.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;" },
-        { question: "Get products with average sale amount over $20.", answer: "SELECT p.product_name, AVG(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING AVG(s.total_amount) > 20;" },
-        { question: "Find top 3 highest-priced products.", answer: "SELECT product_name, price FROM products ORDER BY price DESC LIMIT 3;" },
-        { question: "List shops with no sales in 2025.", answer: "SELECT shop_name FROM candy_shops WHERE shop_id NOT IN (SELECT shop_id FROM sales WHERE sale_date LIKE '2025%');" },
-        { question: "Get total stock quantity per product category.", answer: "SELECT category, SUM(stock_quantity) FROM products GROUP BY category;" },
-        { question: "Find products not sold in the last month.", answer: "SELECT p.product_name FROM products p WHERE p.product_id NOT IN (SELECT product_id FROM sales WHERE sale_date > DATE_SUB(CURDATE(), INTERVAL 1 MONTH));" },
-        { question: "List shops with average rating above 4.", answer: "SELECT shop_name, rating FROM candy_shops WHERE rating > 4;" },
-        { question: "Get total sales per month in 2025.", answer: "SELECT MONTH(sale_date), SUM(total_amount) FROM sales WHERE sale_date LIKE '2025%' GROUP BY MONTH(sale_date);" },
-        { question: "Find products with stock below 10.", answer: "SELECT product_name, stock_quantity FROM products WHERE stock_quantity < 10;" },
-        { question: "List top 5 best-selling products by quantity.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name ORDER BY SUM(s.quantity_sold) DESC LIMIT 5;" },
-        { question: "Get average price per product category.", answer: "SELECT category, AVG(price) FROM products GROUP BY category;" },
-        { question: "Find shops with total sales over $500.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > 500;" },
-        { question: "List products with no sales.", answer: "SELECT product_name FROM products WHERE product_id NOT IN (SELECT product_id FROM sales);" },
-        { question: "Get total sales amount per shop in 'Candyland'.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Candyland' GROUP BY cs.shop_name;" },
-        { question: "Find products sold more than 100 times.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING SUM(s.quantity_sold) > 100;" },
-        { question: "List shops with rating below average.", answer: "SELECT shop_name, rating FROM candy_shops WHERE rating < (SELECT AVG(rating) FROM candy_shops);" },
-        { question: "Get total sales per product category.", answer: "SELECT p.category, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.category;" },
-        { question: "Find shops with sales in the last week.", answer: "SELECT DISTINCT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date > DATE_SUB(CURDATE(), INTERVAL 7 DAY);" },
-        { question: "List products with price above category average.", answer: "SELECT p.product_name, p.price FROM products p WHERE p.price > (SELECT AVG(price) FROM products p2 WHERE p2.category = p.category);" },
-        { question: "Get total quantity sold per shop.", answer: "SELECT cs.shop_name, SUM(s.quantity_sold) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;" },
-        { question: "Find products with total sales amount over $1000.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING SUM(s.total_amount) > 1000;" },
-        { question: "List shops with no products under $5.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.price < 5);" },
-        { question: "Get average sale amount per day.", answer: "SELECT sale_date, AVG(total_amount) FROM sales GROUP BY sale_date;" },
-        { question: "Find products with stock equal to total sold.", answer: "SELECT p.product_name, p.stock_quantity, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.stock_quantity HAVING p.stock_quantity = SUM(s.quantity_sold);" },
-        { question: "List shops with sales exceeding 50 items.", answer: "SELECT cs.shop_name, SUM(s.quantity_sold) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.quantity_sold) > 50;" },
-        { question: "Get total sales for 'Chocolate' category.", answer: "SELECT SUM(s.total_amount) FROM sales s JOIN products p ON s.product_id = p.product_id WHERE p.category = 'Chocolate';" },
-        { question: "Find products with no sales in 2025.", answer: "SELECT p.product_name FROM products p WHERE p.product_id NOT IN (SELECT product_id FROM sales WHERE sale_date LIKE '2025%');" },
-        { question: "List shops with average sale amount over $30.", answer: "SELECT cs.shop_name, AVG(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING AVG(s.total_amount) > 30;" },
-        { question: "Get total stock value per category.", answer: "SELECT category, SUM(price * stock_quantity) FROM products GROUP BY category;" },
-        { question: "Find shops with sales in 'Sugarville'.", answer: "SELECT DISTINCT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Sugarville';" },
-        { question: "List products with price below average.", answer: "SELECT product_name, price FROM products WHERE price < (SELECT AVG(price) FROM products);" },
-        { question: "Get total sales per shop in 2024.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date LIKE '2024%' GROUP BY cs.shop_name;" },
-        { question: "Find products sold in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));" },
-        { question: "List shops with more than 10 sales.", answer: "SELECT cs.shop_name, COUNT(s.sale_id) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING COUNT(s.sale_id) > 10;" },
-        { question: "Get average quantity sold per product.", answer: "SELECT p.product_name, AVG(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name;" },
-        { question: "Find shops with no 'Gummy' sales.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Gummy');" },
-        { question: "List products sorted by total sales amount.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name ORDER BY SUM(s.total_amount) DESC;" },
-        { question: "Get total sales per day in January 2025.", answer: "SELECT sale_date, SUM(total_amount) FROM sales WHERE sale_date LIKE '2025-01%' GROUP BY sale_date;" },
-        { question: "Find shops with rating above average sales.", answer: "SELECT cs.shop_name, cs.rating FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name, cs.rating HAVING cs.rating > (SELECT AVG(rating) FROM candy_shops);" },
-        { question: "List products with stock below average.", answer: "SELECT product_name, stock_quantity FROM products WHERE stock_quantity < (SELECT AVG(stock_quantity) FROM products);" },
-        { question: "Get total quantity sold per category.", answer: "SELECT p.category, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.category;" },
-        { question: "Find shops with sales over $1000 in 2025.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date LIKE '2025%' GROUP BY cs.shop_name HAVING SUM(s.total_amount) > 1000;" },
-        { question: "List products with sales in 'Candyland' only.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Candyland' AND p.product_id NOT IN (SELECT s2.product_id FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.location != 'Candyland');" },
-        { question: "Get average sale amount per shop.", answer: "SELECT cs.shop_name, AVG(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;" },
-        { question: "Find products with sales exceeding stock.", answer: "SELECT p.product_name, SUM(s.quantity_sold), p.stock_quantity FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.stock_quantity HAVING SUM(s.quantity_sold) > p.stock_quantity;" },
-        { question: "List shops with sales in every category.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT DISTINCT p.category FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p2 ON s.product_id = p2.product_id WHERE s.shop_id = cs.shop_id AND p2.category = p.category));" },
-        { question: "Get total sales per product in 'Sugarville'.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Sugarville' GROUP BY p.product_name;" },
-        { question: "Find shops with no sales under $10.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.total_amount < 10);" }
+        { question: "Find total quantity sold per product.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name;", result: { columns: ['product_name', 'SUM(s.quantity_sold)'], rows: [
+          { product_name: "Lollipop", 'SUM(s.quantity_sold)': 10 },
+          { product_name: "Chocolate Bar", 'SUM(s.quantity_sold)': 15 },
+          { product_name: "Gummy Bears", 'SUM(s.quantity_sold)': 20 },
+          { product_name: "Hard Candy", 'SUM(s.quantity_sold)': 50 },
+          { product_name: "Caramel Chew", 'SUM(s.quantity_sold)': 30 }
+        ]} },
+        { question: "List shops and their total sales amount.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;", result: { columns: ['shop_name', 'SUM(s.total_amount)'], rows: [
+          { shop_name: "Candy Haven", 'SUM(s.total_amount)': 40.00 },
+          { shop_name: "Sugar Delight", 'SUM(s.total_amount)': 30.00 },
+          { shop_name: "Choco Bliss", 'SUM(s.total_amount)': 15.00 },
+          { shop_name: "Gummy World", 'SUM(s.total_amount)': 37.50 }
+        ]} },
+        { question: "Get products with average sale amount over $20.", answer: "SELECT p.product_name, AVG(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING AVG(s.total_amount) > 20;", result: { columns: ['product_name', 'AVG(s.total_amount)'], rows: [] } },
+        { question: "Find top 3 highest-priced products.", answer: "SELECT product_name, price FROM products ORDER BY price DESC LIMIT 3;", result: { columns: ['product_name', 'price'], rows: [
+          { product_name: "Chocolate Bar", price: 2.00 },
+          { product_name: "Lollipop", price: 1.50 },
+          { product_name: "Caramel Chew", price: 1.25 }
+        ]} },
+        { question: "List shops with no sales in 2025.", answer: "SELECT shop_name FROM candy_shops WHERE shop_id NOT IN (SELECT shop_id FROM sales WHERE sale_date LIKE '2025%');", result: { columns: ['shop_name'], rows: [] } }
       ],
       advanced: [
-        { question: "Find the most popular product per shop by quantity sold.", answer: "SELECT cs.shop_name, p.product_name, SUM(s.quantity_sold) as total_sold FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.product_name HAVING total_sold = (SELECT SUM(s2.quantity_sold) FROM sales s2 WHERE s2.shop_id = cs.shop_id GROUP BY s2.product_id ORDER BY SUM(s2.quantity_sold) DESC LIMIT 1);" },
-        { question: "List shops with sales exceeding average stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT AVG(p.price * p.stock_quantity) FROM products p JOIN sales s2 ON p.product_id = s2.product_id WHERE s2.shop_id = cs.shop_id GROUP BY s2.shop_id);" },
-        { question: "Find products sold in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));" },
-        { question: "Get shops with above-average sales per category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id);" },
-        { question: "Find shops with no sales of low-stock products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.stock_quantity < 10);" },
-        { question: "List products outselling their category average.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.category HAVING SUM(s.quantity_sold) > (SELECT AVG(SUM(s2.quantity_sold)) FROM products p2 JOIN sales s2 ON p2.product_id = s2.product_id WHERE p2.category = p.category GROUP BY p2.product_id);" },
-        { question: "Get shops with sales growth over last year.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) THEN s.total_amount ELSE 0 END) > SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) - 1 THEN s.total_amount ELSE 0 END);" },
-        { question: "Find products with sales in every month of 2025.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id WHERE YEAR(s.sale_date) = 2025 GROUP BY p.product_name HAVING COUNT(DISTINCT MONTH(s.sale_date)) = 12;" },
-        { question: "List shops with exclusive category sales.", answer: "SELECT cs.shop_name, p.category FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING COUNT(DISTINCT p.category) = 1;" },
-        { question: "Get total sales per shop exceeding stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount), SUM(p.price * p.stock_quantity) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > SUM(p.price * p.stock_quantity);" },
-        { question: "Find shops with no sales of 'Chocolate' products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Chocolate');" },
-        { question: "List products with sales exceeding twice their stock.", answer: "SELECT p.product_name, SUM(s.quantity_sold), p.stock_quantity FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.stock_quantity HAVING SUM(s.quantity_sold) > 2 * p.stock_quantity;" },
-        { question: "Get shops with highest sales per category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) as total FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING total = (SELECT SUM(s2.total_amount) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id ORDER BY SUM(s2.total_amount) DESC LIMIT 1);" },
-        { question: "Find products with no sales in high-rated shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE s.product_id = p.product_id AND cs.rating >= 4);" },
-        { question: "List shops with sales in all price ranges.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT DISTINCT FLOOR(p.price / 5) * 5 as price_range FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p2 ON s.product_id = p2.product_id WHERE s.shop_id = cs.shop_id AND FLOOR(p2.price / 5) * 5 = FLOOR(p.price / 5) * 5));" },
-        { question: "Get total sales per shop and category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category;" },
-        { question: "Find shops with declining sales trend.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) THEN s.total_amount ELSE 0 END) < SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) - 1 THEN s.total_amount ELSE 0 END);" },
-        { question: "List products with consistent daily sales in 2025.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id WHERE s.sale_date LIKE '2025-01%' GROUP BY p.product_name HAVING COUNT(DISTINCT s.sale_date) = DAY(LAST_DAY('2025-01-01'));" },
-        { question: "Get shops with sales exceeding average category sales.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id);" },
-        { question: "Find products with sales in top-rated shops only.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.rating = 5 AND p.product_id NOT IN (SELECT s2.product_id FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.rating < 5);" },
-        { question: "List shops with no sales below average price.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.price < (SELECT AVG(price) FROM products));" },
-        { question: "Get total sales per shop with low stock products.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id WHERE p.stock_quantity < 10 GROUP BY cs.shop_name;" },
-        { question: "Find products with sales in every shop location.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT DISTINCT cs.location FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs2 ON s.shop_id = cs2.shop_id WHERE s.product_id = p.product_id AND cs2.location = cs.location));" },
-        { question: "List shops with sales exceeding stock in 2025.", answer: "SELECT cs.shop_name, SUM(s.quantity_sold), SUM(p.stock_quantity) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id WHERE s.sale_date LIKE '2025%' GROUP BY cs.shop_name HAVING SUM(s.quantity_sold) > SUM(p.stock_quantity);" },
-        { question: "Get shops with highest sales per product.", answer: "SELECT cs.shop_name, p.product_name, SUM(s.total_amount) as total FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.product_name HAVING total = (SELECT SUM(s2.total_amount) FROM sales s2 WHERE s2.product_id = p.product_id GROUP BY s2.shop_id ORDER BY SUM(s2.total_amount) DESC LIMIT 1);" },
-        { question: "Find products with no sales in low-rated shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE s.product_id = p.product_id AND cs.rating < 3);" },
-        { question: "List shops with sales in every month of 2025.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date LIKE '2025%' GROUP BY cs.shop_name HAVING COUNT(DISTINCT MONTH(s.sale_date)) = 12;" },
-        { question: "Get total sales per category in top-rated shops.", answer: "SELECT p.category, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.rating = 5 GROUP BY p.category;" },
-        { question: "Find shops with no sales of high-priced products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.price > (SELECT AVG(price) FROM products));" },
-        { question: "List products with sales exceeding category median.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.category HAVING SUM(s.total_amount) > (SELECT SUM(s2.total_amount) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY p2.product_id ORDER BY SUM(s2.total_amount) LIMIT 1 OFFSET (SELECT COUNT(*) / 2 FROM products p3 WHERE p3.category = p.category));" },
-        { question: "Get shops with sales in 'Candyland' exceeding others.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Candyland' GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT SUM(s2.total_amount) FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.location != 'Candyland' GROUP BY cs2.shop_id ORDER BY SUM(s2.total_amount) DESC LIMIT 1);" },
-        { question: "Find products with sales in all rating levels.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT DISTINCT FLOOR(cs.rating) as rating_level FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs2 ON s.shop_id = cs2.shop_id WHERE s.product_id = p.product_id AND FLOOR(cs2.rating) = FLOOR(cs.rating)));" },
-        { question: "List shops with sales doubling stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount), SUM(p.price * p.stock_quantity) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > 2 * SUM(p.price * p.stock_quantity);" },
-        { question: "Get total sales per shop in low-stock categories.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id WHERE p.category IN (SELECT category FROM products GROUP BY category HAVING AVG(stock_quantity) < 10) GROUP BY cs.shop_name;" },
-        { question: "Find shops with no sales in 2024.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.sale_date LIKE '2024%');" },
-        { question: "List products with sales in 'Sugarville' only.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Sugarville' AND p.product_id NOT IN (SELECT s2.product_id FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.location != 'Sugarville');" },
-        { question: "Get shops with sales exceeding average shop sales.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT AVG(SUM(total_amount)) FROM sales GROUP BY shop_id);" },
-        { question: "Find products with no sales in 'Candyland'.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE s.product_id = p.product_id AND cs.location = 'Candyland');" },
-        { question: "List shops with sales in top 3 categories.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT p.category FROM (SELECT p2.category FROM products p2 JOIN sales s2 ON p2.product_id = s2.product_id GROUP BY p2.category ORDER BY SUM(s2.total_amount) DESC LIMIT 3) top_cats WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p3 ON s.product_id = p3.product_id WHERE s.shop_id = cs.shop_id AND p3.category = top_cats.category));" },
-        { question: "Get total sales per product in high-rated shops.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.rating >= 4 GROUP BY p.product_name;" },
-        { question: "Find shops with sales in every stock level.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT DISTINCT FLOOR(p.stock_quantity / 50) * 50 as stock_level FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p2 ON s.product_id = p2.product_id WHERE s.shop_id = cs.shop_id AND FLOOR(p2.stock_quantity / 50) * 50 = FLOOR(p.stock_quantity / 50) * 50));" },
-        { question: "List products with sales doubling category average.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.category HAVING SUM(s.total_amount) > 2 * (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY p2.product_id);" },
-        { question: "Get shops with no sales of 'Gummy' in 2025.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Gummy' AND s.sale_date LIKE '2025%');" },
-        { question: "Find products with sales in 'Choco Land' exceeding others.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Choco Land' GROUP BY p.product_name HAVING SUM(s.total_amount) > (SELECT SUM(s2.total_amount) FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE s2.product_id = p.product_id AND cs2.location != 'Choco Land');" },
-        { question: "List shops with sales exceeding total stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT SUM(price * stock_quantity) FROM products);" },
-        { question: "Get total sales per shop in 'Gummyville'.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Gummyville' GROUP BY cs.shop_id;" }
+        { question: "Find the most popular product per shop by quantity sold.", answer: "SELECT cs.shop_name, p.product_name, SUM(s.quantity_sold) as total_sold FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.product_name HAVING total_sold = (SELECT SUM(s2.quantity_sold) FROM sales s2 WHERE s2.shop_id = cs.shop_id GROUP BY s2.product_id ORDER BY SUM(s2.quantity_sold) DESC LIMIT 1);", result: { columns: ['shop_name', 'product_name', 'total_sold'], rows: [
+          { shop_name: "Candy Haven", product_name: "Hard Candy", total_sold: 50 },
+          { shop_name: "Sugar Delight", product_name: "Chocolate Bar", total_sold: 15 },
+          { shop_name: "Choco Bliss", product_name: "Gummy Bears", total_sold: 20 },
+          { shop_name: "Gummy World", product_name: "Caramel Chew", total_sold: 30 }
+        ]} },
+        { question: "List shops with sales exceeding average stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT AVG(p.price * p.stock_quantity) FROM products p JOIN sales s2 ON p.product_id = s2.product_id WHERE s2.shop_id = cs.shop_id GROUP BY s2.shop_id);", result: { columns: ['shop_name', 'SUM(s.total_amount)'], rows: [] } },
+        { question: "Find products sold in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));", result: { columns: ['product_name'], rows: [] } },
+        { question: "Get shops with above-average sales per category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id);", result: { columns: ['shop_name', 'category', 'SUM(s.total_amount)'], rows: [] } }
       ]
     };
     const usedQuestions = {
@@ -575,6 +488,190 @@
       medium: new Set(),
       advanced: new Set(),
     };
+
+    const mockDatabase = {
+      candy_shops: [
+        { shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 },
+        { shop_id: 2, shop_name: "Sugar Delight", location: "Sugarville", rating: 3.8 },
+        { shop_id: 3, shop_name: "Choco Bliss", location: "Choco Land", rating: 4.9 },
+        { shop_id: 4, shop_name: "Gummy World", location: "Gummyville", rating: 3.2 },
+        { shop_id: 5, shop_name: "Sweet Shop", location: "Sweet Town", rating: 4.0 }
+      ],
+      products: [
+        { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
+        { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 },
+        { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 },
+        { product_id: 4, product_name: "Hard Candy", category: "Hard Candy", price: 0.50, stock_quantity: 100 },
+        { product_id: 5, product_name: "Caramel Chew", category: "Caramel", price: 1.25, stock_quantity: 75 }
+      ],
+      sales: [
+        { sale_id: 1, shop_id: 1, product_id: 1, sale_date: "2025-03-01", quantity_sold: 10, total_amount: 15.00 },
+        { sale_id: 2, shop_id: 2, product_id: 2, sale_date: "2025-03-02", quantity_sold: 15, total_amount: 30.00 },
+        { sale_id: 3, shop_id: 3, product_id: 3, sale_date: "2025-03-03", quantity_sold: 20, total_amount: 15.00 },
+        { sale_id: 4, shop_id: 1, product_id: 4, sale_date: "2025-03-04", quantity_sold: 50, total_amount: 25.00 },
+        { sale_id: 5, shop_id: 4, product_id: 5, sale_date: "2025-03-05", quantity_sold: 30, total_amount: 37.50 }
+      ]
+    };
+
+    function executeQuery(query) {
+      try {
+        const tables = {
+          'candy_shops': mockDatabase.candy_shops,
+          'products': mockDatabase.products,
+          'sales': mockDatabase.sales
+        };
+
+        const keywords = query.toUpperCase().match(/\b(SELECT|FROM|WHERE|JOIN|GROUP|BY|HAVING|ORDER|LIMIT|NOT|IN|AND|OR|AS|SUM|AVG|COUNT|DISTINCT)\b/g) || [];
+        if (!keywords.includes('SELECT') || !keywords.includes('FROM')) {
+          return { error: "Invalid SQL query: Missing SELECT or FROM clause." };
+        }
+
+        let result = [...tables[query.match(/FROM\s+(\w+)/i)[1]] || []];
+
+        // Handle JOIN
+        const joinMatch = query.match(/JOIN\s+(\w+)\s+ON\s+(.+)/i);
+        if (joinMatch) {
+          const joinTable = joinMatch[1];
+          const joinCondition = joinMatch[2];
+          const [leftCol, rightCol] = joinCondition.split('=').map(col => col.trim());
+          result = result.flatMap(row =>
+            tables[joinTable].filter(joinRow =>
+              eval(`row.${leftCol.split('.')[1]} === joinRow.${rightCol.split('.')[1]}`)
+            ).map(joinRow => ({ ...row, ...joinRow }))
+          );
+        }
+
+        // Handle WHERE
+        const whereMatch = query.match(/WHERE\s+(.+)/i);
+        if (whereMatch) {
+          const condition = whereMatch[1].replace(/'([^']+)'/g, (match, p1) => `"${p1}"`);
+          result = result.filter(row => {
+            try {
+              return eval(condition.replace(/(\w+)\.(\w+)/g, 'row.$2'));
+            } catch (e) {
+              return false;
+            }
+          });
+        }
+
+        // Handle GROUP BY and aggregation
+        const groupByMatch = query.match(/GROUP\s+BY\s+(.+)/i);
+        if (groupByMatch) {
+          const groupByCols = groupByMatch[1].split(',').map(col => col.trim().split('.')[1]);
+          const havingMatch = query.match(/HAVING\s+(.+)/i);
+          const aggregates = {};
+          const grouped = {};
+          result.forEach(row => {
+            const key = groupByCols.map(col => row[col]).join('|');
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(row);
+          });
+          result = Object.values(grouped).map(group => {
+            const aggRow = {};
+            groupByCols.forEach(col => aggRow[col] = group[0][col]);
+            return aggRow;
+          });
+
+          const selectMatch = query.match(/SELECT\s+(.+?)(?:\s+FROM|\s+WHERE|\s+GROUP|\s+$)/i);
+          if (selectMatch) {
+            const selectClause = selectMatch[1].split(',').map(col => col.trim());
+            selectClause.forEach(col => {
+              const match = col.match(/(\w+)\((.+)\)/);
+              if (match) {
+                const aggFunc = match[1].toLowerCase();
+                const aggCol = match[2].split('.')[1];
+                result = result.map((row, index) => {
+                  const group = grouped[Object.values(row).join('|')];
+                  let value;
+                  switch (aggFunc) {
+                    case 'sum':
+                      value = group.reduce((sum, r) => sum + (r[aggCol] || 0), 0);
+                      break;
+                    case 'avg':
+                      value = group.reduce((sum, r) => sum + (r[aggCol] || 0), 0) / group.length;
+                      break;
+                    case 'count':
+                      value = group.length;
+                      break;
+                    case 'max':
+                      value = Math.max(...group.map(r => r[aggCol] || -Infinity));
+                      break;
+                    case 'min':
+                      value = Math.min(...group.map(r => r[aggCol] || Infinity));
+                      break;
+                  }
+                  return { ...row, [col]: value };
+                });
+              }
+            });
+          }
+
+          if (havingMatch) {
+            const havingCondition = havingMatch[1].replace(/'([^']+)'/g, (match, p1) => `"${p1}"`);
+            result = result.filter(row => {
+              try {
+                return eval(havingCondition);
+              } catch (e) {
+                return false;
+              }
+            });
+          }
+        }
+
+        // Handle ORDER BY
+        const orderByMatch = query.match(/ORDER\s+BY\s+(.+)/i);
+        if (orderByMatch) {
+          const orderByCols = orderByMatch[1].split(',').map(col => {
+            const [colName, dir] = col.trim().split(' ');
+            return { col: colName.split('.')[1], dir: dir || 'ASC' };
+          });
+          result.sort((a, b) => {
+            for (let { col, dir } of orderByCols) {
+              if (a[col] < b[col]) return dir.toUpperCase() === 'ASC' ? -1 : 1;
+              if (a[col] > b[col]) return dir.toUpperCase() === 'ASC' ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+
+        // Handle LIMIT
+        const limitMatch = query.match(/LIMIT\s+(\d+)/i);
+        if (limitMatch) {
+          const limit = parseInt(limitMatch[1]);
+          result = result.slice(0, limit);
+        }
+
+        // Extract selected columns
+        const selectMatch = query.match(/SELECT\s+(.+?)(?:\s+FROM|\s+WHERE|\s+GROUP|\s+$)/i);
+        let columns = [];
+        if (selectMatch) {
+          columns = selectMatch[1].split(',').map(col => {
+            const match = col.trim().match(/(\w+)\((.+)\)/);
+            return match ? `${match[1]}(${match[2].split('.')[1]})` : col.trim().split('.')[1] || '*';
+          });
+        }
+        if (columns[0] === '*') {
+          columns = Object.keys(result[0] || {});
+        } else {
+          result = result.map(row => {
+            const newRow = {};
+            columns.forEach(col => {
+              const match = col.match(/(\w+)\((.+)\)/);
+              if (match) {
+                newRow[col] = row[col];
+              } else {
+                newRow[col] = row[col];
+              }
+            });
+            return newRow;
+          });
+        }
+
+        return { columns, rows: result };
+      } catch (e) {
+        return { error: `Query execution failed: ${e.message}` };
+      }
+    }
 
     window.onload = () => {
       generateTilePositions();
@@ -727,6 +824,11 @@
           setTimeout(() => getQuestion(currentDifficulty), 1000);
         }
       }
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
     }
 
     function updateTimer() {
@@ -825,9 +927,17 @@
         return;
       }
       const answerDiv = document.getElementById("answer");
-      const userAnswer = answerDiv.innerText.trim();
-      const correctAnswer = currentQuestion.answer.trim();
-      if (userAnswer === correctAnswer) {
+      const userQuery = answerDiv.innerText.trim();
+      const correctResult = currentQuestion.result;
+      const userResult = executeQuery(userQuery);
+
+      if (userResult.error) {
+        showMessage(`Error: ${userResult.error}`);
+        return;
+      }
+
+      const isCorrect = JSON.stringify(userResult) === JSON.stringify(correctResult);
+      if (isCorrect) {
         closePopup();
         if (stickyAnswersNeeded > 0) {
           stickyAnswersNeeded--;
@@ -839,10 +949,10 @@
           }
         } else {
           movePlayer(spacesToMove);
-          showMessage("Correct! You moved forward!");
+          showMessage(`Correct! You moved forward ${spacesToMove} space(s)!`);
         }
       } else {
-        showMessage("Incorrect answer. Try again or use a hint!");
+        showMessage("Incorrect answer. Try again or use a hint! Your result doesn't match the expected output.");
       }
     }
 
