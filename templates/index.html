@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>SQL Candy Quest 🍭</title>
+  <!-- Include canvas-confetti for celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    /* Your existing CSS remains unchanged */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: radial-gradient(circle, #ffe6f2, #ffeef8, #fff);
+      background: linear-gradient(135deg, #87cefa, #98fb98, #afeeee, #b0e0e6);
       font-family: 'Comic Sans MS', cursive, sans-serif;
       color: #333;
       overflow: hidden;
@@ -52,6 +53,7 @@
       border-radius: 10px;
       padding: 10px;
       background: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     #score-list {
       list-style: none;
@@ -60,44 +62,33 @@
     }
     #score-list li {
       padding: 5px 0;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px dashed #ff80ab;
     }
     h1 {
-      font-size: 32px;
+      font-size: 36px;
       color: #ff4081;
       text-shadow: 2px 2px #fff;
       margin: 0;
+      letter-spacing: 1px;
     }
-    .character-select button {
+    .character-select button, .controls button {
       background: #ff80ab;
       color: #fff;
       border: none;
-      padding: 8px 20px;
+      padding: 10px 25px;
       margin: 5px;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s;
+      font-size: 18px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
-    .character-select button:hover {
-      background: #ff4081;
-    }
-    .controls button {
-      background: #ff80ab;
-      color: #fff;
-      border: none;
-      padding: 8px 20px;
-      margin: 5px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s;
-    }
-    .controls button:hover {
-      background: #ff4081;
+    .character-select button:hover, .controls button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 15px rgba(255, 64, 129, 0.7);
     }
     #hints-left {
-      font-size: 16px;
+      font-size: 18px;
       color: #ff4081;
       margin: 5px 0;
       text-shadow: 1px 1px #fff;
@@ -125,7 +116,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 28px; /* Increased from 22px */
       font-weight: bold;
       color: #fff;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -137,10 +128,14 @@
     .start-tile {
       background: #ffd700;
       color: #333;
-      font-size: 20px;
+      font-size: 24px; /* Increased from 20px */
+    }
+    .sticky-tile {
+      background: #ffa500;
+      font-size: 34px; /* Increased from 28px */
     }
     .castle-icon {
-      font-size: 36px;
+      font-size: 42px; /* Increased from 36px */
     }
     #player {
       font-size: 60px;
@@ -173,14 +168,22 @@
       font-size: 24px;
       margin-bottom: 10px;
     }
-    .popup textarea {
+    #answer {
       width: 90%;
+      min-height: 100px;
       padding: 10px;
       margin: 10px 0;
       border: 2px solid #ff80ab;
       border-radius: 5px;
       font-size: 16px;
-      resize: vertical;
+      font-family: 'Courier New', monospace;
+      background: #fff;
+      outline: none;
+      overflow: auto;
+    }
+    #answer[contenteditable]:empty:before {
+      content: attr(placeholder);
+      color: #aaa;
     }
     .popup-buttons button {
       background: #bae1ff;
@@ -231,6 +234,16 @@
       border-radius: 5px;
       font-size: 16px;
     }
+    .sql-keyword {
+      color: #0000ff;
+      font-weight: bold;
+    }
+    .sql-string {
+      color: #008000;
+    }
+    .sql-number {
+      color: #ff00ff;
+    }
   </style>
 </head>
 <body>
@@ -268,7 +281,7 @@
       <button class="close-button" onclick="closePopup()">×</button>
       <h2>Sweet Challenge 🍬</h2>
       <p id="question-text"></p>
-      <textarea id="answer" rows="4" placeholder="Type your SQL query here..."></textarea>
+      <div id="answer" contenteditable="true" placeholder="Type your SQL query here..."></div>
       <div class="popup-buttons">
         <button onclick="submitAnswer()">Submit</button>
         <button onclick="showHint()">Hint</button>
@@ -317,11 +330,14 @@
     const tileSizeX = tileSpacingX * 0.9;
     const tileSizeY = tileSpacingY * 0.8;
     const tilePositions = [];
+    const stickyTiles = new Set();
+    let stickyAnswersNeeded = 0;
     const pastelColors = [
       '#ffb3ba', '#bae1ff', '#baffc9', '#ffdfba', '#ffffba',
       '#f4b3ff', '#b3ffec', '#f9b3ff', '#ffd6b3', '#b3c0ff',
       '#ffe6b3', '#b3ffd6', '#d6b3ff', '#ffb3d9', '#b3ffe6'
     ];
+    const candyIcons = ['🍬', '🍫', '🍭', '🍰', '🍪', '🍩', '🧁', '🍮', '🍦'];
 
     const sqlQuestions = {
       easy: [
@@ -435,7 +451,7 @@
         { question: "Find shops with no sales of low-stock products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.stock_quantity < 10);" },
         { question: "List products outselling their category average.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.category HAVING SUM(s.quantity_sold) > (SELECT AVG(SUM(s2.quantity_sold)) FROM products p2 JOIN sales s2 ON p2.product_id = s2.product_id WHERE p2.category = p.category GROUP BY p2.product_id);" },
         { question: "Get shops with sales growth over last year.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) THEN s.total_amount ELSE 0 END) > SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) - 1 THEN s.total_amount ELSE 0 END);" },
-        { question: "Find products with sales in every month of 2025.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id WHERE s.sale_date LIKE '2025%' GROUP BY p.product_name HAVING COUNT(DISTINCT MONTH(s.sale_date)) = 12;" },
+        { question: "Find products with sales in every month of 2025.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id WHERE YEAR(s.sale_date) = 2025 GROUP BY p.product_name HAVING COUNT(DISTINCT MONTH(s.sale_date)) = 12;" },
         { question: "List shops with exclusive category sales.", answer: "SELECT cs.shop_name, p.category FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING COUNT(DISTINCT p.category) = 1;" },
         { question: "Get total sales per shop exceeding stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount), SUM(p.price * p.stock_quantity) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > SUM(p.price * p.stock_quantity);" },
         { question: "Find shops with no sales of 'Chocolate' products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Chocolate');" },
@@ -446,7 +462,7 @@
         { question: "Get total sales per shop and category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category;" },
         { question: "Find shops with declining sales trend.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) THEN s.total_amount ELSE 0 END) < SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) - 1 THEN s.total_amount ELSE 0 END);" },
         { question: "List products with consistent daily sales in 2025.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id WHERE s.sale_date LIKE '2025-01%' GROUP BY p.product_name HAVING COUNT(DISTINCT s.sale_date) = DAY(LAST_DAY('2025-01-01'));" },
-        { question: "Get shops with sales exceeding average category sales.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category);" },
+        { question: "Get shops with sales exceeding average category sales.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id);" },
         { question: "Find products with sales in top-rated shops only.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.rating = 5 AND p.product_id NOT IN (SELECT s2.product_id FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.rating < 5);" },
         { question: "List shops with no sales below average price.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.price < (SELECT AVG(price) FROM products));" },
         { question: "Get total sales per shop with low stock products.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id WHERE p.stock_quantity < 10 GROUP BY cs.shop_name;" },
@@ -487,6 +503,8 @@
       generateTiles();
       startTime = Date.now();
       timeInterval = setInterval(updateTimer, 1000);
+      loadScoreboard();
+      setupSyntaxHighlighting();
     };
 
     function generateTilePositions() {
@@ -505,6 +523,7 @@
     function generateTiles() {
       const container = document.getElementById("tiles-container");
       container.innerHTML = "";
+      stickyTiles.clear();
       for (let i = 0; i < totalSpaces; i++) {
         const tile = document.createElement("div");
         tile.classList.add("tile");
@@ -519,7 +538,13 @@
         } else if (i === totalSpaces - 1) {
           tile.innerHTML = `<span class="castle-icon">🏰</span>`;
         } else {
-          tile.innerText = i;
+          if (Math.random() < 0.2 && i !== 0 && i !== totalSpaces - 1) {
+            tile.classList.add("sticky-tile");
+            tile.innerText = "🍯";
+            stickyTiles.add(i);
+          } else {
+            tile.innerText = candyIcons[Math.floor(Math.random() * candyIcons.length)];
+          }
         }
         container.appendChild(tile);
       }
@@ -530,6 +555,7 @@
       playerPosition = 0;
       hintsLeft = 3;
       moveCount = 0;
+      stickyAnswersNeeded = 0;
       document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
       placePlayer();
       closePopup();
@@ -546,24 +572,29 @@
     function selectCharacter(icon) {
       playerIcon = icon;
       document.getElementById("player").innerText = icon;
-      playerPosition = 0;
-      hintsLeft = 3;
-      moveCount = 0;
-      document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
-      placePlayer();
-      closePopup();
-      closeMessagePopup();
+      resetPlayer();
     }
 
     function movePlayer(spaces) {
       moveCount++;
-      playerPosition += spaces;
-      if (playerPosition >= totalSpaces - 1) {
-        playerPosition = totalSpaces - 1;
-        placePlayer();
+      const newPosition = Math.min(playerPosition + spaces, totalSpaces - 1);
+      playerPosition = newPosition;
+      placePlayer();
+
+      if (playerPosition === totalSpaces - 1) {
         showFinalPopup();
-      } else {
-        placePlayer();
+      } else if (stickyTiles.has(playerPosition)) {
+        if (stickyAnswersNeeded === 0) {
+          stickyAnswersNeeded = 2;
+          showMessage("🍯 Sticky Honey! Answer two questions correctly to move past this tile!");
+        } else {
+          stickyAnswersNeeded--;
+          if (stickyAnswersNeeded > 0) {
+            showMessage(`🍯 One more correct answer to pass the sticky honey! (${stickyAnswersNeeded} left)`);
+          } else {
+            showMessage("🍯 You’ve cleared the sticky honey! Move forward on your next turn.");
+          }
+        }
       }
     }
 
@@ -574,21 +605,43 @@
       document.getElementById("time-display").innerText = `Time Elapsed: ${minutes}m ${seconds}s`;
     }
 
+    function loadScoreboard() {
+      const saved = localStorage.getItem("scoreboard");
+      if (saved) {
+        scoreboard.push(...JSON.parse(saved));
+        updateScoreboardDisplay();
+      }
+    }
+
+    function saveScoreboard() {
+      localStorage.setItem("scoreboard", JSON.stringify(scoreboard));
+    }
+
     function updateScoreboard(playerName) {
       const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+      let achievements = [];
+      if (moveCount < 10) achievements.push("🏆 Candy Master");
+      if (hintsLeft === 3) achievements.push("✨ SQL Wizard");
       const scoreboardEntry = {
         name: playerName,
         moves: moveCount,
-        time: elapsedSec
+        time: elapsedSec,
+        achievements: achievements
       };
       scoreboard.push(scoreboardEntry);
+      saveScoreboard();
+      updateScoreboardDisplay();
+    }
+
+    function updateScoreboardDisplay() {
       const list = document.getElementById("score-list");
       list.innerHTML = "";
-      scoreboard.forEach((entry, i) => {
+      scoreboard.forEach((entry) => {
         const li = document.createElement("li");
         const mins = Math.floor(entry.time / 60);
         const secs = entry.time % 60;
-        li.textContent = `${entry.name} - ${entry.moves} moves, ${mins}m ${secs}s`;
+        const achievementsText = entry.achievements.length > 0 ? ` - ${entry.achievements.join(", ")}` : "";
+        li.textContent = `${entry.name} - ${entry.moves} moves, ${mins}m ${secs}s${achievementsText}`;
         list.appendChild(li);
       });
     }
@@ -597,10 +650,17 @@
       document.getElementById("final-message").innerText = `You reached the Candy Castle in ${moveCount} moves!`;
       document.getElementById("player-name").value = "";
       document.getElementById("final-popup").style.display = "block";
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
     }
+
     function closeFinalPopup() {
       document.getElementById("final-popup").style.display = "none";
     }
+
     function submitFinalScore() {
       const nameField = document.getElementById("player-name");
       const playerName = nameField.value.trim() || "Anonymous";
@@ -628,7 +688,9 @@
       const originalIndex = pool.indexOf(currentQuestion);
       used.add(originalIndex);
       document.getElementById("question-text").innerText = currentQuestion.question;
-      document.getElementById("answer").value = "";
+      const answerDiv = document.getElementById("answer");
+      answerDiv.innerHTML = "";
+      answerDiv.focus();
       document.getElementById("question-popup").style.display = "block";
     }
 
@@ -637,14 +699,31 @@
         showMessage("No question is active right now.");
         return;
       }
-      const userAnswer = document.getElementById("answer").value.trim();
+      const userAnswer = document.getElementById("answer").innerText.trim();
       if (userAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
         closePopup();
-        showMessage("🎉 Correct! Moving forward.");
-        movePlayer(spacesToMove);
+        if (stickyTiles.has(playerPosition) && stickyAnswersNeeded > 0) {
+          stickyAnswersNeeded--;
+          if (stickyAnswersNeeded === 0) {
+            showMessage("🎉 Correct! You’ve cleared the sticky honey! Move forward on your next turn.");
+          } else {
+            showMessage(`🎉 Correct! ${stickyAnswersNeeded} more correct answer(s) to pass the sticky honey.`);
+          }
+        } else {
+          showMessage("🎉 Correct! Moving forward.");
+          movePlayer(spacesToMove);
+        }
         currentQuestion = null;
       } else {
-        showMessage("❌ Incorrect! Try again.");
+        let feedback = "❌ Incorrect! ";
+        const userLower = userAnswer.toLowerCase();
+        const correctLower = currentQuestion.answer.toLowerCase();
+        if (!userLower.includes("select")) feedback += "You need a SELECT clause. ";
+        if (!userLower.includes("from")) feedback += "Missing a FROM clause. ";
+        if (correctLower.includes("join") && !userLower.includes("join")) feedback += "You forgot to join a table! ";
+        if (correctLower.includes("where") && !userLower.includes("where")) feedback += "A WHERE clause is needed. ";
+        if (correctLower.includes("group by") && !userLower.includes("group by")) feedback += "Try grouping the results. ";
+        showMessage(feedback);
       }
     }
 
@@ -701,19 +780,60 @@
       }
     }
 
+    function setupSyntaxHighlighting() {
+      const answerDiv = document.getElementById("answer");
+      answerDiv.addEventListener("input", highlightSyntax);
+      answerDiv.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          document.execCommand("insertHTML", false, "<br>");
+        }
+      });
+    }
+
+    function highlightSyntax() {
+      const answerDiv = document.getElementById("answer");
+      let text = answerDiv.innerText;
+      const keywords = /\b(SELECT|FROM|WHERE|JOIN|ON|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|IN|LIKE|BETWEEN|DISTINCT|SUM|AVG|COUNT|MAX|MIN|DATE_SUB|CURDATE|MONTH|YEAR)\b/gi;
+      const strings = /('[^']*')/g;
+      const numbers = /\b(\d+\.?\d*)\b/g;
+
+      text = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(keywords, '<span class="sql-keyword">$1</span>')
+        .replace(strings, '<span class="sql-string">$1</span>')
+        .replace(numbers, '<span class="sql-number">$1</span>')
+        .replace(/\n/g, "<br>");
+
+      const selection = window.getSelection();
+      const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+      answerDiv.innerHTML = text;
+      if (range) {
+        try {
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } catch (e) {
+          // Ignore cursor restoration errors
+        }
+      }
+    }
+
     function closePopup() {
       document.getElementById("question-popup").style.display = "none";
     }
+
     function showMessage(msg) {
-      // Replace ANSI color codes with CSS styles for HTML display
       const formattedMsg = msg
-        .replace(/\u001b\[34m/g, '<span style="color: blue; font-weight: bold;">') // Blue for candy_shops
-        .replace(/\u001b\[32m/g, '<span style="color: green; font-weight: bold;">') // Green for products
-        .replace(/\u001b\[31m/g, '<span style="color: red; font-weight: bold;">')   // Red for sales
+        .replace(/\u001b\[34m/g, '<span style="color: blue; font-weight: bold;">')
+        .replace(/\u001b\[32m/g, '<span style="color: green; font-weight: bold;">')
+        .replace(/\u001b\[31m/g, '<span style="color: red; font-weight: bold;">')
         .replace(/\u001b\[0m/g, '</span>');
       document.getElementById("message-text").innerHTML = formattedMsg;
       document.getElementById("message-popup").style.display = "block";
     }
+
     function closeMessagePopup() {
       document.getElementById("message-popup").style.display = "none";
     }
