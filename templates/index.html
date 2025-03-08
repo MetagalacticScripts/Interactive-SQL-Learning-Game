@@ -4,143 +4,150 @@
   <meta charset="UTF-8">
   <title>SQL Candy Quest 🍭</title>
   <style>
-    /* =======================
-       Global Styles
-       ======================= */
-    body {
+    /* Your existing CSS remains unchanged */
+    html, body {
       margin: 0;
-      padding: 20px;
-      text-align: center;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      padding: 0;
+      height: 100%;
       background: radial-gradient(circle, #ffe6f2, #ffeef8, #fff);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
       color: #333;
+      overflow: hidden;
     }
-    h1 {
-      font-size: 50px;
-      color: #ff4081;
-      text-shadow: 2px 2px #fff;
+    .container {
+      display: flex;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .sidebar {
+      width: 250px;
+      background: rgba(255, 255, 255, 0.85);
+      border-right: 6px dashed #ff80ab;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h2, h3 {
       margin: 10px 0;
-    }
-    h2 {
-      font-size: 28px;
       color: #ff4081;
       text-shadow: 1px 1px #fff;
-      margin-bottom: 20px;
     }
-    h3 {
-      color: #ff4081;
-      font-size: 22px;
+    .time-display {
+      font-size: 18px;
       margin: 10px 0;
+      color: #ff4081;
+      text-shadow: 1px 1px #fff;
     }
-
-    /* =======================
-       Character Select
-       ======================= */
+    #scoreboard {
+      margin-top: 20px;
+      border: 2px solid #ff80ab;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+    #score-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    #score-list li {
+      padding: 5px 0;
+      border-bottom: 1px solid #ccc;
+    }
+    h1 {
+      font-size: 32px;
+      color: #ff4081;
+      text-shadow: 2px 2px #fff;
+      margin: 0;
+    }
     .character-select button {
       background: #ff80ab;
       color: #fff;
       border: none;
-      padding: 12px 25px;
+      padding: 8px 20px;
       margin: 5px;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       transition: background 0.3s;
     }
     .character-select button:hover {
       background: #ff4081;
     }
-
-    /* =======================
-       Game Board
-       ======================= */
-    .board {
-      width: 900px;
-      height: 700px;
-      background: rgba(255, 255, 255, 0.9);
-      margin: 30px auto;
-      border-radius: 30px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-      position: relative;
-      overflow: hidden;
-      border: 6px dashed #ff80ab;
-    }
-    .tiles {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* =======================
-       Tiles
-       ======================= */
-    .tile {
-      width: 100px;
-      height: 100px;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      font-weight: bold;
-      color: #fff;
-      position: absolute;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s;
-    }
-    .tile:hover {
-      transform: scale(1.05);
-    }
-    /* Pastel Candy Colors */
-    .tile:nth-child(5n+1) { background: #ffb3ba; } /* Pink */
-    .tile:nth-child(5n+2) { background: #bae1ff; } /* Blue */
-    .tile:nth-child(5n+3) { background: #baffc9; } /* Green */
-    .tile:nth-child(5n+4) { background: #ffdfba; } /* Orange */
-    .tile:nth-child(5n+5) { background: #ffffba; } /* Yellow */
-
-    .start-tile {
-      background: #ffd700;
-      font-size: 24px;
-      color: #333;
-    }
-
-    /* =======================
-       Player
-       ======================= */
-    #player {
-      font-size: 80px; /* bigger icon */
-      position: absolute;
-      transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
-      z-index: 10;
-    }
-
-    /* =======================
-       Controls
-       ======================= */
     .controls button {
       background: #ff80ab;
-      color: white;
+      color: #fff;
       border: none;
-      padding: 14px 30px;
+      padding: 8px 20px;
       margin: 5px;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       transition: background 0.3s;
     }
     .controls button:hover {
       background: #ff4081;
     }
     #hints-left {
-      font-size: 20px;
+      font-size: 16px;
       color: #ff4081;
-      margin: 10px 0;
+      margin: 5px 0;
       text-shadow: 1px 1px #fff;
     }
-
-    /* =======================
-       Popup for Questions
-       ======================= */
+    .board {
+      width: 98%;
+      max-width: 1400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.9);
+      margin: 10px 0;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      position: relative;
+      border: 6px dashed #ff80ab;
+      overflow: hidden;
+    }
+    .tiles {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .tile {
+      position: absolute;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+    }
+    .tile:hover {
+      transform: scale(1.05);
+    }
+    .start-tile {
+      background: #ffd700;
+      color: #333;
+      font-size: 20px;
+    }
+    .castle-icon {
+      font-size: 36px;
+    }
+    #player {
+      font-size: 60px;
+      position: absolute;
+      transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+      z-index: 10;
+    }
     .popup {
       display: none;
       position: fixed;
@@ -149,7 +156,7 @@
       transform: translate(-50%, -50%);
       background: rgba(255, 235, 205, 0.95);
       border-radius: 20px;
-      padding: 25px;
+      padding: 20px;
       width: 500px;
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
       z-index: 1000;
@@ -157,45 +164,45 @@
     .popup-content {
       background: #fff;
       border: 5px solid #ff80ab;
-      padding: 20px;
+      padding: 15px;
       border-radius: 15px;
-      position: relative; /* so close button can be positioned */
+      position: relative;
     }
     .popup h2 {
       color: #ff4081;
-      font-size: 30px;
-      margin-bottom: 15px;
+      font-size: 24px;
+      margin-bottom: 10px;
     }
-    .popup input {
+    .popup textarea {
       width: 90%;
       padding: 10px;
-      margin: 15px 0;
+      margin: 10px 0;
       border: 2px solid #ff80ab;
       border-radius: 5px;
-      font-size: 18px;
+      font-size: 16px;
+      resize: vertical;
     }
     .popup-buttons button {
       background: #bae1ff;
       color: #333;
       border: none;
-      padding: 10px 20px;
+      padding: 8px 16px;
       margin: 5px;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
       transition: background 0.3s;
     }
     .popup-buttons button:hover {
       background: #36a2eb;
     }
-    /* Close (X) Button inside the popup */
     .close-button {
       position: absolute;
       top: 10px;
       right: 15px;
       background: transparent;
       border: none;
-      font-size: 24px;
+      font-size: 20px;
       cursor: pointer;
       color: #888;
       transition: color 0.3s;
@@ -203,89 +210,65 @@
     .close-button:hover {
       color: #ff4081;
     }
-
-    /* =======================
-       Custom Message Popup
-       ======================= */
-    .message-popup {
-      display: none;
-      position: fixed;
-      top: 55%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      border: 5px solid #ff80ab;
-      border-radius: 20px;
-      width: 400px;
-      padding: 20px;
-      z-index: 2000;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-    }
-    .message-popup-content {
-      position: relative;
-      padding: 20px;
-      font-size: 18px;
-    }
-    .message-popup .close-button {
-      top: 10px;
-      right: 15px;
-    }
-    .message-popup p {
+    #message-popup .popup-content p {
       margin: 0;
       padding: 10px 0;
       color: #555;
+      white-space: pre-wrap;
     }
-    .ok-button {
-      background: #bae1ff;
-      color: #333;
-      border: none;
-      padding: 8px 16px;
+    #final-popup .popup-content {
+      text-align: center;
+    }
+    #final-popup .confetti {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    #final-popup input {
+      width: 80%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 2px solid #ff80ab;
       border-radius: 5px;
-      cursor: pointer;
       font-size: 16px;
-      transition: background 0.3s;
-    }
-    .ok-button:hover {
-      background: #36a2eb;
     }
   </style>
 </head>
 <body>
-  <h1>SQL Candy Quest 🍭</h1>
-  <h2>Answer SQL challenges correctly to reach the Candy Castle! 🏰</h2>
-
-  <!-- Character Selection -->
-  <div class="character-select">
-    <h3>Choose Your Character:</h3>
-    <button onclick="selectCharacter('🍭')">Lollipop</button>
-    <button onclick="selectCharacter('🍬')">Candy</button>
-    <button onclick="selectCharacter('🍫')">Chocolate</button>
+  <div class="container">
+    <div class="sidebar">
+      <h2>SQL Candy Quest 🍭</h2>
+      <div class="time-display" id="time-display">Time Elapsed: 0m 0s</div>
+      <div id="scoreboard">
+        <h3>Scoreboard</h3>
+        <ul id="score-list"></ul>
+      </div>
+    </div>
+    <div class="main-content">
+      <h1>Reach the Candy Castle!</h1>
+      <div class="character-select">
+        <button onclick="selectCharacter('🍭')">Lollipop</button>
+        <button onclick="selectCharacter('🍬')">Candy</button>
+        <button onclick="selectCharacter('🍫')">Chocolate</button>
+      </div>
+      <div class="board">
+        <div id="tiles-container" class="tiles"></div>
+        <div id="player">🍭</div>
+      </div>
+      <div class="controls">
+        <button onclick="getQuestion('easy')">Easy Path</button>
+        <button onclick="getQuestion('medium')">Medium Path</button>
+        <button onclick="getQuestion('advanced')">Advanced Path</button>
+        <button onclick="resetPlayer()">Reset</button>
+      </div>
+      <div id="hints-left">Hints Left: 3</div>
+    </div>
   </div>
-
-  <!-- Game Board -->
-  <div class="board">
-    <div id="tiles-container" class="tiles"></div>
-    <div id="player">🍭</div>
-  </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <button onclick="getQuestion('easy')">Easy Path</button>
-    <button onclick="getQuestion('medium')">Medium Path</button>
-    <button onclick="getQuestion('advanced')">Advanced Path</button>
-    <button onclick="resetPlayer()">Reset</button>
-  </div>
-
-  <div id="hints-left">Hints Left: 3</div>
-
-  <!-- Popup for Questions -->
   <div id="question-popup" class="popup">
     <div class="popup-content">
-      <!-- Close Button -->
       <button class="close-button" onclick="closePopup()">×</button>
       <h2>Sweet Challenge 🍬</h2>
       <p id="question-text"></p>
-      <input type="text" id="answer" placeholder="Type your SQL query here...">
+      <textarea id="answer" rows="4" placeholder="Type your SQL query here..."></textarea>
       <div class="popup-buttons">
         <button onclick="submitAnswer()">Submit</button>
         <button onclick="showHint()">Hint</button>
@@ -294,183 +277,367 @@
       </div>
     </div>
   </div>
-
-  <!-- Custom Message Popup (replaces alerts) -->
-  <div id="message-popup" class="message-popup">
-    <div class="message-popup-content">
+  <div id="message-popup" class="popup">
+    <div class="popup-content">
       <button class="close-button" onclick="closeMessagePopup()">×</button>
       <p id="message-text"></p>
-      <button class="ok-button" onclick="closeMessagePopup()">OK</button>
+      <div class="popup-buttons">
+        <button onclick="closeMessagePopup()">OK</button>
+      </div>
+    </div>
+  </div>
+  <div id="final-popup" class="popup">
+    <div class="popup-content">
+      <button class="close-button" onclick="closeFinalPopup()">×</button>
+      <div class="confetti">🎉🎊🎉🎊</div>
+      <p id="final-message"></p>
+      <input type="text" id="player-name" placeholder="Enter your name">
+      <div class="popup-buttons">
+        <button onclick="submitFinalScore()">Submit</button>
+      </div>
     </div>
   </div>
 
   <script>
-    /* ========================================
-       GLOBAL VARIABLES & INITIAL SETUP
-    ======================================= */
+    const totalSpaces = 20;
     let playerPosition = 0;
-    const totalSpaces = 17;
     let hintsLeft = 3;
-    let playerIcon = "🍭"; // Default
-
-    /* We'll track how many spaces to move based on difficulty. */
+    let playerIcon = "🍭";
+    let currentQuestion = null;
     let spacesToMove = 1;
-
-    /* Adjust for bigger board */
-    const tileSize = 100;
-    const tileSpacing = 120;
-
+    let moveCount = 0;
+    let startTime = Date.now();
+    let timeInterval = null;
+    const scoreboard = [];
+    const rows = 2, cols = 10;
+    const boardWidth = 1400 * 0.98;
+    const boardHeight = 400;
+    const tileSpacingX = boardWidth / cols;
+    const tileSpacingY = boardHeight / rows;
+    const tileSizeX = tileSpacingX * 0.9;
+    const tileSizeY = tileSpacingY * 0.8;
     const tilePositions = [];
+    const pastelColors = [
+      '#ffb3ba', '#bae1ff', '#baffc9', '#ffdfba', '#ffffba',
+      '#f4b3ff', '#b3ffec', '#f9b3ff', '#ffd6b3', '#b3c0ff',
+      '#ffe6b3', '#b3ffd6', '#d6b3ff', '#ffb3d9', '#b3ffe6'
+    ];
 
-    // Generate tile positions in a 5-column layout
-    for (let i = 0; i < totalSpaces; i++) {
-      let x = 100 + (i % 5) * tileSpacing;
-      let y = 100 + Math.floor(i / 5) * tileSpacing;
-      tilePositions.push([x, y]);
+    const sqlQuestions = {
+      easy: [
+        { question: "Find all candy shops in 'Candyland'.", answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';" },
+        { question: "List all products with a price less than $5.", answer: "SELECT * FROM products WHERE price < 5;" },
+        { question: "Get all sales from '2025-01-01'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-01-01';" },
+        { question: "Select all products with stock quantity above 100.", answer: "SELECT * FROM products WHERE stock_quantity > 100;" },
+        { question: "List shops with a rating of 4 or higher.", answer: "SELECT * FROM candy_shops WHERE rating >= 4;" },
+        { question: "Get all products in the 'Chocolate' category.", answer: "SELECT * FROM products WHERE category = 'Chocolate';" },
+        { question: "Find sales with quantity sold greater than 10.", answer: "SELECT * FROM sales WHERE quantity_sold > 10;" },
+        { question: "List products priced exactly $2.50.", answer: "SELECT * FROM products WHERE price = 2.50;" },
+        { question: "Select shops with rating exactly 5.", answer: "SELECT * FROM candy_shops WHERE rating = 5;" },
+        { question: "Get sales with total amount over $50.", answer: "SELECT * FROM sales WHERE total_amount > 50;" },
+        { question: "Find shops in 'Sugarville'.", answer: "SELECT * FROM candy_shops WHERE location = 'Sugarville';" },
+        { question: "List products with category 'Gummy'.", answer: "SELECT * FROM products WHERE category = 'Gummy';" },
+        { question: "Get products with stock quantity of 0.", answer: "SELECT * FROM products WHERE stock_quantity = 0;" },
+        { question: "Select sales with quantity sold of 1.", answer: "SELECT * FROM sales WHERE quantity_sold = 1;" },
+        { question: "Find shops with rating below 3.", answer: "SELECT * FROM candy_shops WHERE rating < 3;" },
+        { question: "List products priced between $1 and $3.", answer: "SELECT * FROM products WHERE price BETWEEN 1 AND 3;" },
+        { question: "Get sales from '2025-03-07'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-03-07';" },
+        { question: "Find products with price greater than $10.", answer: "SELECT * FROM products WHERE price > 10;" },
+        { question: "List shops with shop_name starting with 'Candy'.", answer: "SELECT * FROM candy_shops WHERE shop_name LIKE 'Candy%';" },
+        { question: "Get products with category 'Hard Candy'.", answer: "SELECT * FROM products WHERE category = 'Hard Candy';" },
+        { question: "Select sales with total amount less than $10.", answer: "SELECT * FROM sales WHERE total_amount < 10;" },
+        { question: "Find products with stock quantity below 50.", answer: "SELECT * FROM products WHERE stock_quantity < 50;" },
+        { question: "List shops in 'Sweet Town'.", answer: "SELECT * FROM candy_shops WHERE location = 'Sweet Town';" },
+        { question: "Get products priced under $1.", answer: "SELECT * FROM products WHERE price < 1;" },
+        { question: "Select sales from the last week.", answer: "SELECT * FROM sales WHERE sale_date > DATE_SUB(CURDATE(), INTERVAL 7 DAY);" },
+        { question: "Find shops with rating of 3.", answer: "SELECT * FROM candy_shops WHERE rating = 3;" },
+        { question: "List products with no stock.", answer: "SELECT * FROM products WHERE stock_quantity = 0;" },
+        { question: "Get sales with quantity sold between 5 and 10.", answer: "SELECT * FROM sales WHERE quantity_sold BETWEEN 5 AND 10;" },
+        { question: "Find products in 'Lollipop' category.", answer: "SELECT * FROM products WHERE category = 'Lollipop';" },
+        { question: "List shops with location 'Candy City'.", answer: "SELECT * FROM candy_shops WHERE location = 'Candy City';" },
+        { question: "Get products with price exactly $5.", answer: "SELECT * FROM products WHERE price = 5;" },
+        { question: "Select sales with total amount exactly $20.", answer: "SELECT * FROM sales WHERE total_amount = 20;" },
+        { question: "Find shops with shop_name containing 'Sweet'.", answer: "SELECT * FROM candy_shops WHERE shop_name LIKE '%Sweet%';" },
+        { question: "List products with stock quantity over 200.", answer: "SELECT * FROM products WHERE stock_quantity > 200;" },
+        { question: "Get sales from '2024-12-31'.", answer: "SELECT * FROM sales WHERE sale_date = '2024-12-31';" },
+        { question: "Find products with category 'Caramel'.", answer: "SELECT * FROM products WHERE category = 'Caramel';" },
+        { question: "List shops with rating above 2.", answer: "SELECT * FROM candy_shops WHERE rating > 2;" },
+        { question: "Get sales with quantity sold less than 3.", answer: "SELECT * FROM sales WHERE quantity_sold < 3;" },
+        { question: "Find products priced at $7.99.", answer: "SELECT * FROM products WHERE price = 7.99;" },
+        { question: "List shops in 'Choco Land'.", answer: "SELECT * FROM candy_shops WHERE location = 'Choco Land';" },
+        { question: "Get products with stock quantity exactly 100.", answer: "SELECT * FROM products WHERE stock_quantity = 100;" },
+        { question: "Select sales with total amount over $100.", answer: "SELECT * FROM sales WHERE total_amount > 100;" },
+        { question: "Find shops with rating below 4.", answer: "SELECT * FROM candy_shops WHERE rating < 4;" },
+        { question: "List products in 'Jelly' category.", answer: "SELECT * FROM products WHERE category = 'Jelly';" },
+        { question: "Get sales from '2025-02-14'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-02-14';" },
+        { question: "Find products with price less than $2.", answer: "SELECT * FROM products WHERE price < 2;" },
+        { question: "List shops with shop_name ending in 'Shop'.", answer: "SELECT * FROM candy_shops WHERE shop_name LIKE '%Shop';" },
+        { question: "Get products with stock quantity below 10.", answer: "SELECT * FROM products WHERE stock_quantity < 10;" },
+        { question: "Select sales with quantity sold over 20.", answer: "SELECT * FROM sales WHERE quantity_sold > 20;" },
+        { question: "Find shops in 'Gummyville'.", answer: "SELECT * FROM candy_shops WHERE location = 'Gummyville';" }
+      ],
+      medium: [
+        { question: "Find total quantity sold per product.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name;" },
+        { question: "List shops and their total sales amount.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;" },
+        { question: "Get products with average sale amount over $20.", answer: "SELECT p.product_name, AVG(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING AVG(s.total_amount) > 20;" },
+        { question: "Find top 3 highest-priced products.", answer: "SELECT product_name, price FROM products ORDER BY price DESC LIMIT 3;" },
+        { question: "List shops with no sales in 2025.", answer: "SELECT shop_name FROM candy_shops WHERE shop_id NOT IN (SELECT shop_id FROM sales WHERE sale_date LIKE '2025%');" },
+        { question: "Get total stock quantity per product category.", answer: "SELECT category, SUM(stock_quantity) FROM products GROUP BY category;" },
+        { question: "Find products not sold in the last month.", answer: "SELECT p.product_name FROM products p WHERE p.product_id NOT IN (SELECT product_id FROM sales WHERE sale_date > DATE_SUB(CURDATE(), INTERVAL 1 MONTH));" },
+        { question: "List shops with average rating above 4.", answer: "SELECT shop_name, rating FROM candy_shops WHERE rating > 4;" },
+        { question: "Get total sales per month in 2025.", answer: "SELECT MONTH(sale_date), SUM(total_amount) FROM sales WHERE sale_date LIKE '2025%' GROUP BY MONTH(sale_date);" },
+        { question: "Find products with stock below 10.", answer: "SELECT product_name, stock_quantity FROM products WHERE stock_quantity < 10;" },
+        { question: "List top 5 best-selling products by quantity.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name ORDER BY SUM(s.quantity_sold) DESC LIMIT 5;" },
+        { question: "Get average price per product category.", answer: "SELECT category, AVG(price) FROM products GROUP BY category;" },
+        { question: "Find shops with total sales over $500.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > 500;" },
+        { question: "List products with no sales.", answer: "SELECT product_name FROM products WHERE product_id NOT IN (SELECT product_id FROM sales);" },
+        { question: "Get total sales amount per shop in 'Candyland'.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Candyland' GROUP BY cs.shop_name;" },
+        { question: "Find products sold more than 100 times.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING SUM(s.quantity_sold) > 100;" },
+        { question: "List shops with rating below average.", answer: "SELECT shop_name, rating FROM candy_shops WHERE rating < (SELECT AVG(rating) FROM candy_shops);" },
+        { question: "Get total sales per product category.", answer: "SELECT p.category, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.category;" },
+        { question: "Find shops with sales in the last week.", answer: "SELECT DISTINCT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date > DATE_SUB(CURDATE(), INTERVAL 7 DAY);" },
+        { question: "List products with price above category average.", answer: "SELECT p.product_name, p.price FROM products p WHERE p.price > (SELECT AVG(price) FROM products p2 WHERE p2.category = p.category);" },
+        { question: "Get total quantity sold per shop.", answer: "SELECT cs.shop_name, SUM(s.quantity_sold) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;" },
+        { question: "Find products with total sales amount over $1000.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING SUM(s.total_amount) > 1000;" },
+        { question: "List shops with no products under $5.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.price < 5);" },
+        { question: "Get average sale amount per day.", answer: "SELECT sale_date, AVG(total_amount) FROM sales GROUP BY sale_date;" },
+        { question: "Find products with stock equal to total sold.", answer: "SELECT p.product_name, p.stock_quantity, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.stock_quantity HAVING p.stock_quantity = SUM(s.quantity_sold);" },
+        { question: "List shops with sales exceeding 50 items.", answer: "SELECT cs.shop_name, SUM(s.quantity_sold) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.quantity_sold) > 50;" },
+        { question: "Get total sales for 'Chocolate' category.", answer: "SELECT SUM(s.total_amount) FROM sales s JOIN products p ON s.product_id = p.product_id WHERE p.category = 'Chocolate';" },
+        { question: "Find products with no sales in 2025.", answer: "SELECT p.product_name FROM products p WHERE p.product_id NOT IN (SELECT product_id FROM sales WHERE sale_date LIKE '2025%');" },
+        { question: "List shops with average sale amount over $30.", answer: "SELECT cs.shop_name, AVG(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING AVG(s.total_amount) > 30;" },
+        { question: "Get total stock value per category.", answer: "SELECT category, SUM(price * stock_quantity) FROM products GROUP BY category;" },
+        { question: "Find shops with sales in 'Sugarville'.", answer: "SELECT DISTINCT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Sugarville';" },
+        { question: "List products with price below average.", answer: "SELECT product_name, price FROM products WHERE price < (SELECT AVG(price) FROM products);" },
+        { question: "Get total sales per shop in 2024.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date LIKE '2024%' GROUP BY cs.shop_name;" },
+        { question: "Find products with sales in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));" },
+        { question: "List shops with more than 10 sales.", answer: "SELECT cs.shop_name, COUNT(s.sale_id) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING COUNT(s.sale_id) > 10;" },
+        { question: "Get average quantity sold per product.", answer: "SELECT p.product_name, AVG(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name;" },
+        { question: "Find shops with no 'Gummy' sales.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Gummy');" },
+        { question: "List products sorted by total sales amount.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name ORDER BY SUM(s.total_amount) DESC;" },
+        { question: "Get total sales per day in January 2025.", answer: "SELECT sale_date, SUM(total_amount) FROM sales WHERE sale_date LIKE '2025-01%' GROUP BY sale_date;" },
+        { question: "Find shops with rating above average sales.", answer: "SELECT cs.shop_name, cs.rating FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name, cs.rating HAVING cs.rating > (SELECT AVG(rating) FROM candy_shops);" },
+        { question: "List products with stock below average.", answer: "SELECT product_name, stock_quantity FROM products WHERE stock_quantity < (SELECT AVG(stock_quantity) FROM products);" },
+        { question: "Get total quantity sold per category.", answer: "SELECT p.category, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.category;" },
+        { question: "Find shops with sales over $1000 in 2025.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date LIKE '2025%' GROUP BY cs.shop_name HAVING SUM(s.total_amount) > 1000;" },
+        { question: "List products with sales in 'Candyland' only.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Candyland' AND p.product_id NOT IN (SELECT s2.product_id FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.location != 'Candyland');" },
+        { question: "Get average sale amount per shop.", answer: "SELECT cs.shop_name, AVG(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;" },
+        { question: "Find products with sales exceeding stock.", answer: "SELECT p.product_name, SUM(s.quantity_sold), p.stock_quantity FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.stock_quantity HAVING SUM(s.quantity_sold) > p.stock_quantity;" },
+        { question: "List shops with sales in every category.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT DISTINCT p.category FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p2 ON s.product_id = p2.product_id WHERE s.shop_id = cs.shop_id AND p2.category = p.category));" },
+        { question: "Get total sales per product in 'Sugarville'.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Sugarville' GROUP BY p.product_name;" },
+        { question: "Find shops with no sales under $10.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.total_amount < 10);" }
+      ],
+      advanced: [
+        { question: "Find the most popular product per shop by quantity sold.", answer: "SELECT cs.shop_name, p.product_name, SUM(s.quantity_sold) as total_sold FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.product_name HAVING total_sold = (SELECT SUM(s2.quantity_sold) FROM sales s2 WHERE s2.shop_id = cs.shop_id GROUP BY s2.product_id ORDER BY SUM(s2.quantity_sold) DESC LIMIT 1);" },
+        { question: "List shops with sales exceeding average stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT AVG(p.price * p.stock_quantity) FROM products p JOIN sales s2 ON p.product_id = s2.product_id WHERE s2.shop_id = cs.shop_id GROUP BY s2.shop_id);" },
+        { question: "Find products sold in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));" },
+        { question: "Get shops with above-average sales per category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id);" },
+        { question: "Find shops with no sales of low-stock products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.stock_quantity < 10);" },
+        { question: "List products outselling their category average.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.category HAVING SUM(s.quantity_sold) > (SELECT AVG(SUM(s2.quantity_sold)) FROM products p2 JOIN sales s2 ON p2.product_id = s2.product_id WHERE p2.category = p.category GROUP BY p2.product_id);" },
+        { question: "Get shops with sales growth over last year.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) THEN s.total_amount ELSE 0 END) > SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) - 1 THEN s.total_amount ELSE 0 END);" },
+        { question: "Find products with sales in every month of 2025.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id WHERE s.sale_date LIKE '2025%' GROUP BY p.product_name HAVING COUNT(DISTINCT MONTH(s.sale_date)) = 12;" },
+        { question: "List shops with exclusive category sales.", answer: "SELECT cs.shop_name, p.category FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING COUNT(DISTINCT p.category) = 1;" },
+        { question: "Get total sales per shop exceeding stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount), SUM(p.price * p.stock_quantity) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > SUM(p.price * p.stock_quantity);" },
+        { question: "Find shops with no sales of 'Chocolate' products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Chocolate');" },
+        { question: "List products with sales exceeding twice their stock.", answer: "SELECT p.product_name, SUM(s.quantity_sold), p.stock_quantity FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.stock_quantity HAVING SUM(s.quantity_sold) > 2 * p.stock_quantity;" },
+        { question: "Get shops with highest sales per category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) as total FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING total = (SELECT SUM(s2.total_amount) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id ORDER BY SUM(s2.total_amount) DESC LIMIT 1);" },
+        { question: "Find products with no sales in high-rated shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE s.product_id = p.product_id AND cs.rating >= 4);" },
+        { question: "List shops with sales in all price ranges.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT DISTINCT FLOOR(p.price / 5) * 5 as price_range FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p2 ON s.product_id = p2.product_id WHERE s.shop_id = cs.shop_id AND FLOOR(p2.price / 5) * 5 = FLOOR(p.price / 5) * 5));" },
+        { question: "Get total sales per shop and category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category;" },
+        { question: "Find shops with declining sales trend.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) THEN s.total_amount ELSE 0 END) < SUM(CASE WHEN YEAR(s.sale_date) = YEAR(CURDATE()) - 1 THEN s.total_amount ELSE 0 END);" },
+        { question: "List products with consistent daily sales in 2025.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id WHERE s.sale_date LIKE '2025-01%' GROUP BY p.product_name HAVING COUNT(DISTINCT s.sale_date) = DAY(LAST_DAY('2025-01-01'));" },
+        { question: "Get shops with sales exceeding average category sales.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category);" },
+        { question: "Find products with sales in top-rated shops only.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.rating = 5 AND p.product_id NOT IN (SELECT s2.product_id FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.rating < 5);" },
+        { question: "List shops with no sales below average price.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.price < (SELECT AVG(price) FROM products));" },
+        { question: "Get total sales per shop with low stock products.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id WHERE p.stock_quantity < 10 GROUP BY cs.shop_name;" },
+        { question: "Find products with sales in every shop location.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT DISTINCT cs.location FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs2 ON s.shop_id = cs2.shop_id WHERE s.product_id = p.product_id AND cs2.location = cs.location));" },
+        { question: "List shops with sales exceeding stock in 2025.", answer: "SELECT cs.shop_name, SUM(s.quantity_sold), SUM(p.stock_quantity) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id WHERE s.sale_date LIKE '2025%' GROUP BY cs.shop_name HAVING SUM(s.quantity_sold) > SUM(p.stock_quantity);" },
+        { question: "Get shops with highest sales per product.", answer: "SELECT cs.shop_name, p.product_name, SUM(s.total_amount) as total FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.product_name HAVING total = (SELECT SUM(s2.total_amount) FROM sales s2 WHERE s2.product_id = p.product_id GROUP BY s2.shop_id ORDER BY SUM(s2.total_amount) DESC LIMIT 1);" },
+        { question: "Find products with no sales in low-rated shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE s.product_id = p.product_id AND cs.rating < 3);" },
+        { question: "List shops with sales in every month of 2025.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date LIKE '2025%' GROUP BY cs.shop_name HAVING COUNT(DISTINCT MONTH(s.sale_date)) = 12;" },
+        { question: "Get total sales per category in top-rated shops.", answer: "SELECT p.category, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.rating = 5 GROUP BY p.category;" },
+        { question: "Find shops with no sales of high-priced products.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.price > (SELECT AVG(price) FROM products));" },
+        { question: "List products with sales exceeding category median.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.category HAVING SUM(s.total_amount) > (SELECT SUM(s2.total_amount) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY p2.product_id ORDER BY SUM(s2.total_amount) LIMIT 1 OFFSET (SELECT COUNT(*) / 2 FROM products p3 WHERE p3.category = p.category));" },
+        { question: "Get shops with sales in 'Candyland' exceeding others.", answer: "SELECT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Candyland' GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT SUM(s2.total_amount) FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.location != 'Candyland' GROUP BY cs2.shop_id ORDER BY SUM(s2.total_amount) DESC LIMIT 1);" },
+        { question: "Find products with sales in all rating levels.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT DISTINCT FLOOR(cs.rating) as rating_level FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs2 ON s.shop_id = cs2.shop_id WHERE s.product_id = p.product_id AND FLOOR(cs2.rating) = FLOOR(cs.rating)));" },
+        { question: "List shops with sales doubling stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount), SUM(p.price * p.stock_quantity) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > 2 * SUM(p.price * p.stock_quantity);" },
+        { question: "Get total sales per shop in low-stock categories.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id WHERE p.category IN (SELECT category FROM products GROUP BY category HAVING AVG(stock_quantity) < 10) GROUP BY cs.shop_name;" },
+        { question: "Find shops with no sales in 2024.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.sale_date LIKE '2024%');" },
+        { question: "List products with sales in 'Sugarville' only.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Sugarville' AND p.product_id NOT IN (SELECT s2.product_id FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE cs2.location != 'Sugarville');" },
+        { question: "Get shops with sales exceeding average shop sales.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT AVG(SUM(total_amount)) FROM sales GROUP BY shop_id);" },
+        { question: "Find products with no sales in 'Candyland'.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE s.product_id = p.product_id AND cs.location = 'Candyland');" },
+        { question: "List shops with sales in top 3 categories.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT p.category FROM (SELECT p2.category FROM products p2 JOIN sales s2 ON p2.product_id = s2.product_id GROUP BY p2.category ORDER BY SUM(s2.total_amount) DESC LIMIT 3) top_cats WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p3 ON s.product_id = p3.product_id WHERE s.shop_id = cs.shop_id AND p3.category = top_cats.category));" },
+        { question: "Get total sales per product in high-rated shops.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.rating >= 4 GROUP BY p.product_name;" },
+        { question: "Find shops with sales in every stock level.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT DISTINCT FLOOR(p.stock_quantity / 50) * 50 as stock_level FROM products p WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p2 ON s.product_id = p2.product_id WHERE s.shop_id = cs.shop_id AND FLOOR(p2.stock_quantity / 50) * 50 = FLOOR(p.stock_quantity / 50) * 50));" },
+        { question: "List products with sales doubling category average.", answer: "SELECT p.product_name, SUM(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name, p.category HAVING SUM(s.total_amount) > 2 * (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY p2.product_id);" },
+        { question: "Get shops with no sales of 'Gummy' in 2025.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Gummy' AND s.sale_date LIKE '2025%');" },
+        { question: "Find products with sales in 'Choco Land' exceeding others.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Choco Land' GROUP BY p.product_name HAVING SUM(s.total_amount) > (SELECT SUM(s2.total_amount) FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE s2.product_id = p.product_id AND cs2.location != 'Choco Land');" },
+        { question: "List shops with sales exceeding total stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT SUM(price * stock_quantity) FROM products);" },
+        { question: "Get total sales per shop in 'Gummyville'.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Gummyville' GROUP BY cs.shop_name;" }
+      ]
+    };
+    const usedQuestions = {
+      easy: new Set(),
+      medium: new Set(),
+      advanced: new Set(),
+    };
+
+    window.onload = () => {
+      generateTilePositions();
+      generateTiles();
+      startTime = Date.now();
+      timeInterval = setInterval(updateTimer, 1000);
+    };
+
+    function generateTilePositions() {
+      let index = 0;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (index >= totalSpaces) return;
+          const x = c * tileSpacingX + (tileSpacingX - tileSizeX) / 2;
+          const y = r * tileSpacingY + (tileSpacingY - tileSizeY) / 2;
+          tilePositions.push([x, y]);
+          index++;
+        }
+      }
     }
 
-    /* ========================================
-       GENERATE TILES
-    ======================================= */
     function generateTiles() {
-      const tilesContainer = document.getElementById("tiles-container");
-      tilesContainer.innerHTML = "";
-
-      // Create "Start" tile
-      const startTile = document.createElement("div");
-      startTile.classList.add("tile", "start-tile");
-      startTile.innerText = "Start";
-      startTile.style.left = `${tilePositions[0][0]}px`;
-      startTile.style.top = `${tilePositions[0][1]}px`;
-      tilesContainer.appendChild(startTile);
-
-      // Create numbered tiles, last is the castle
-      for (let i = 1; i < totalSpaces; i++) {
+      const container = document.getElementById("tiles-container");
+      container.innerHTML = "";
+      for (let i = 0; i < totalSpaces; i++) {
         const tile = document.createElement("div");
         tile.classList.add("tile");
-        tile.innerText = i === totalSpaces - 1 ? "🏰" : i;
-        tile.style.left = `${tilePositions[i][0]}px`;
-        tile.style.top = `${tilePositions[i][1]}px`;
-        tilesContainer.appendChild(tile);
+        tile.style.width = tileSizeX + "px";
+        tile.style.height = tileSizeY + "px";
+        tile.style.left = tilePositions[i][0] + "px";
+        tile.style.top = tilePositions[i][1] + "px";
+        tile.style.background = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+        if (i === 0) {
+          tile.classList.add("start-tile");
+          tile.innerText = "Start";
+        } else if (i === totalSpaces - 1) {
+          tile.innerHTML = `<span class="castle-icon">🏰</span>`;
+        } else {
+          tile.innerText = i;
+        }
+        container.appendChild(tile);
       }
-
       resetPlayer();
     }
 
-    /* ========================================
-       MOVE PLAYER
-    ======================================= */
-    function movePlayer(spaces) {
-      playerPosition = Math.min(playerPosition + spaces, totalSpaces - 1);
-      const [x, y] = tilePositions[playerPosition];
-      const player = document.getElementById("player");
-      player.style.left = `${x}px`;
-      player.style.top = `${y}px`;
-
-      // Reached the Candy Castle?
-      if (playerPosition === totalSpaces - 1) {
-        showMessage("🎉 Congratulations! You've reached the Candy Castle!");
-        resetPlayer();
-      }
-    }
-
-    /* ========================================
-       RESET PLAYER
-    ======================================= */
     function resetPlayer() {
       playerPosition = 0;
       hintsLeft = 3;
+      moveCount = 0;
       document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
-
-      const [x, y] = tilePositions[playerPosition];
-      const player = document.getElementById("player");
-      player.style.left = `${x}px`;
-      player.style.top = `${y}px`;
-
-      // Also close any open popups
+      placePlayer();
       closePopup();
       closeMessagePopup();
     }
 
-    /* ========================================
-       CHARACTER SELECTION
-    ======================================= */
+    function placePlayer() {
+      const player = document.getElementById("player");
+      const [x, y] = tilePositions[playerPosition];
+      player.style.left = x + "px";
+      player.style.top = y + "px";
+    }
+
     function selectCharacter(icon) {
       playerIcon = icon;
       document.getElementById("player").innerText = icon;
-      resetPlayer();
+      playerPosition = 0;
+      hintsLeft = 3;
+      moveCount = 0;
+      document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
+      placePlayer();
+      closePopup();
+      closeMessagePopup();
     }
 
-    /* ========================================
-       SQL CHALLENGES
-    ======================================= */
-    let currentQuestion = null;
+    function movePlayer(spaces) {
+      moveCount++;
+      playerPosition += spaces;
+      if (playerPosition >= totalSpaces - 1) {
+        playerPosition = totalSpaces - 1;
+        placePlayer();
+        showFinalPopup();
+      } else {
+        placePlayer();
+      }
+    }
 
-    const sqlQuestions = {
-      easy: [
-        {
-          question: "Find all candy shops in 'Candyland'.",
-          answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';"
-        },
-        {
-          question: "Get all candy ingredients that are 'Rare'.",
-          answer: "SELECT * FROM candy_ingredients WHERE rarity = 'Rare';"
-        }
-      ],
-      medium: [
-        {
-          question: "List all unique candy ingredient rarities.",
-          answer: "SELECT DISTINCT rarity FROM candy_ingredients;"
-        },
-        {
-          question: "Find the highest-rated candy shops.",
-          answer: "SELECT * FROM candy_shops WHERE rating = 5;"
-        }
-      ],
-      advanced: [
-        {
-          question: "Retrieve candy ingredients and their shop names.",
-          answer: "SELECT candy_ingredients.name, candy_shops.name FROM candy_ingredients JOIN candy_shops ON candy_ingredients.shop_id = candy_shops.id;"
-        },
-        {
-          question: "Find the number of ingredients available at each shop.",
-          answer: "SELECT COUNT(*) FROM candy_ingredients GROUP BY shop_id;"
-        }
-      ]
-    };
+    function updateTimer() {
+      const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsedSec / 60);
+      const seconds = elapsedSec % 60;
+      document.getElementById("time-display").innerText = `Time Elapsed: ${minutes}m ${seconds}s`;
+    }
 
-    /* Get question for chosen difficulty, set how many spaces to move. */
+    function updateScoreboard(playerName) {
+      const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+      const scoreboardEntry = {
+        name: playerName,
+        moves: moveCount,
+        time: elapsedSec
+      };
+      scoreboard.push(scoreboardEntry);
+      const list = document.getElementById("score-list");
+      list.innerHTML = "";
+      scoreboard.forEach((entry, i) => {
+        const li = document.createElement("li");
+        const mins = Math.floor(entry.time / 60);
+        const secs = entry.time % 60;
+        li.textContent = `${entry.name} - ${entry.moves} moves, ${mins}m ${secs}s`;
+        list.appendChild(li);
+      });
+    }
+
+    function showFinalPopup() {
+      document.getElementById("final-message").innerText = `You reached the Candy Castle in ${moveCount} moves!`;
+      document.getElementById("player-name").value = "";
+      document.getElementById("final-popup").style.display = "block";
+    }
+    function closeFinalPopup() {
+      document.getElementById("final-popup").style.display = "none";
+    }
+    function submitFinalScore() {
+      const nameField = document.getElementById("player-name");
+      const playerName = nameField.value.trim() || "Anonymous";
+      updateScoreboard(playerName);
+      closeFinalPopup();
+      resetPlayer();
+      startTime = Date.now();
+    }
+
     function getQuestion(difficulty) {
       switch(difficulty) {
-        case 'easy':
-          spacesToMove = 1;
-          break;
-        case 'medium':
-          spacesToMove = 2;
-          break;
-        case 'advanced':
-          spacesToMove = 3;
-          break;
+        case "easy": spacesToMove = 1; break;
+        case "medium": spacesToMove = 2; break;
+        case "advanced": spacesToMove = 3; break;
       }
-      const questionList = sqlQuestions[difficulty];
-      currentQuestion = questionList[Math.floor(Math.random() * questionList.length)];
-
-      // Show question in popup
+      const pool = sqlQuestions[difficulty];
+      const used = usedQuestions[difficulty];
+      const available = pool.filter((q, idx) => !used.has(idx));
+      if (available.length === 0) {
+        showMessage("No more questions left for this difficulty!");
+        return;
+      }
+      const randIndex = Math.floor(Math.random() * available.length);
+      currentQuestion = available[randIndex];
+      const originalIndex = pool.indexOf(currentQuestion);
+      used.add(originalIndex);
       document.getElementById("question-text").innerText = currentQuestion.question;
       document.getElementById("answer").value = "";
       document.getElementById("question-popup").style.display = "block";
     }
 
-    /* ========================================
-       QUESTION SUBMISSION
-    ======================================= */
     function submitAnswer() {
       if (!currentQuestion) {
         showMessage("No question is active right now.");
         return;
       }
       const userAnswer = document.getElementById("answer").value.trim();
-
       if (userAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
         closePopup();
         showMessage("🎉 Correct! Moving forward.");
@@ -481,68 +648,75 @@
       }
     }
 
-    /* ========================================
-       HINT & SCHEMA
-    ======================================= */
     function showHint() {
-      if (hintsLeft > 0 && currentQuestion) {
+      if (!currentQuestion) {
+        showMessage("No active question!");
+        return;
+      }
+      if (hintsLeft > 0) {
         const keyCondition = currentQuestion.question.split("'")[1] || "the key condition";
         showMessage(`Hint: Think about filtering with WHERE on '${keyCondition}'.`);
         hintsLeft--;
         document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
       } else {
-        showMessage("No hints left or no active question!");
+        showMessage("No hints left!");
       }
     }
 
     function showDatabaseSchema() {
       showMessage(
-        "Tables:\n" +
-        "1. candy_shops - id, name, location, rating\n" +
-        "2. candy_ingredients - id, name, rarity, shop_id"
+        "Database Schema:\n\n" +
+        "\u001b[34m=== candy_shops ===\u001b[0m\n" +
+        "shop_id INT PRIMARY KEY\n" +
+        "shop_name VARCHAR(100) NOT NULL\n" +
+        "location VARCHAR(100)\n" +
+        "rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)\n\n" +
+        "\u001b[32m=== products ===\u001b[0m\n" +
+        "product_id INT PRIMARY KEY\n" +
+        "product_name VARCHAR(100) NOT NULL\n" +
+        "category VARCHAR(50)\n" +
+        "price DECIMAL(6,2)\n" +
+        "stock_quantity INT\n\n" +
+        "\u001b[31m=== sales ===\u001b[0m\n" +
+        "sale_id INT PRIMARY KEY\n" +
+        "shop_id INT (FK to candy_shops)\n" +
+        "product_id INT (FK to products)\n" +
+        "sale_date DATE\n" +
+        "quantity_sold INT\n" +
+        "total_amount DECIMAL(10,2)"
       );
     }
 
-    /* ========================================
-       SHOW ANSWER & CLOSE QUESTION
-    ======================================= */
     function showAnswer() {
-      if (currentQuestion) {
-        showMessage(
-          `Answer: ${currentQuestion.answer}\n\n` +
-          "Explanation: This query retrieves the requested data using SQL filtering and joins as needed."
-        );
-        // Immediately close the question popup
-        closePopup();
-        // Mark the question as finished
-        currentQuestion = null;
+      if (!currentQuestion) return;
+      showMessage(
+        `Answer: ${currentQuestion.answer}\n\n` +
+        "Explanation: This query retrieves the requested data using SQL filtering and joins as needed."
+      );
+      closePopup();
+      currentQuestion = null;
+      if (playerPosition > 0) {
+        playerPosition = Math.max(playerPosition - 1, 0);
+        placePlayer();
       }
     }
 
-    /* ========================================
-       CUSTOM POPUP CONTROLS
-    ======================================= */
     function closePopup() {
       document.getElementById("question-popup").style.display = "none";
     }
-
-    /* ========================================
-       CUSTOM MESSAGE POPUP (REPLACES ALERT)
-    ======================================= */
     function showMessage(msg) {
-      document.getElementById("message-text").innerText = msg;
+      // Replace ANSI color codes with CSS styles for HTML display
+      const formattedMsg = msg
+        .replace(/\u001b\[34m/g, '<span style="color: blue; font-weight: bold;">') // Blue for candy_shops
+        .replace(/\u001b\[32m/g, '<span style="color: green; font-weight: bold;">') // Green for products
+        .replace(/\u001b\[31m/g, '<span style="color: red; font-weight: bold;">')   // Red for sales
+        .replace(/\u001b\[0m/g, '</span>');
+      document.getElementById("message-text").innerHTML = formattedMsg;
       document.getElementById("message-popup").style.display = "block";
     }
     function closeMessagePopup() {
       document.getElementById("message-popup").style.display = "none";
     }
-
-    /* ========================================
-       ON WINDOW LOAD
-    ======================================= */
-    window.onload = () => {
-      generateTiles();
-    };
   </script>
 </body>
 </html>
