@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>SQL Candy Quest 🍭</title>
-  <!-- Include canvas-confetti for celebration -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: linear-gradient(135deg, #87cefa, #98fb98, #afeeee, #b0e0e6);
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, #E6F0FA, #EAF7F0);
+      font-family: 'Roboto', sans-serif;
       color: #333;
       overflow: hidden;
+      direction: ltr; /* Force left-to-right text direction */
     }
     .container {
       display: flex;
@@ -21,11 +22,12 @@
       box-sizing: border-box;
     }
     .sidebar {
-      width: 250px;
-      background: rgba(255, 255, 255, 0.85);
-      border-right: 6px dashed #ff80ab;
-      padding: 20px;
+      width: 300px;
+      background: #FFFFFF;
+      border-right: 1px solid #E0E0E0;
+      padding: 25px;
       box-sizing: border-box;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
       overflow-y: auto;
     }
     .main-content {
@@ -33,27 +35,27 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
+      padding: 25px;
       box-sizing: border-box;
     }
     h2, h3 {
-      margin: 10px 0;
-      color: #ff4081;
-      text-shadow: 1px 1px #fff;
+      margin: 12px 0;
+      color: #4A90E2;
+      font-weight: 500;
+      font-size: 28px;
     }
     .time-display {
-      font-size: 18px;
-      margin: 10px 0;
-      color: #ff4081;
-      text-shadow: 1px 1px #fff;
+      font-size: 22px;
+      margin: 12px 0;
+      color: #4A90E2;
     }
     #scoreboard {
-      margin-top: 20px;
-      border: 2px solid #ff80ab;
+      margin-top: 25px;
+      border: 1px solid #E0E0E0;
       border-radius: 10px;
-      padding: 10px;
-      background: #fff;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 12px;
+      background: #FAFAFA;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
     }
     #score-list {
       list-style: none;
@@ -61,49 +63,63 @@
       padding: 0;
     }
     #score-list li {
-      padding: 5px 0;
-      border-bottom: 1px dashed #ff80ab;
+      padding: 6px 0;
+      border-bottom: 1px solid #E0E0E0;
+      font-size: 18px;
     }
     h1 {
-      font-size: 36px;
-      color: #ff4081;
-      text-shadow: 2px 2px #fff;
-      margin: 0;
-      letter-spacing: 1px;
+      font-size: 60px;
+      color: #4A90E2;
+      margin: 35px 0;
+      padding: 25px;
+      font-weight: 500;
     }
     .character-select button, .controls button {
-      background: #ff80ab;
-      color: #fff;
+      background: #4A90E2;
+      color: #FFFFFF;
       border: none;
-      padding: 10px 25px;
-      margin: 5px;
-      border-radius: 12px;
+      padding: 12px 30px;
+      margin: 6px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 18px;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      font-size: 22px;
+      transition: background 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     .character-select button:hover, .controls button:hover {
+      background: #357ABD;
       transform: scale(1.1);
-      box-shadow: 0 4px 15px rgba(255, 64, 129, 0.7);
     }
     #hints-left {
-      font-size: 18px;
-      color: #ff4081;
-      margin: 5px 0;
-      text-shadow: 1px 1px #fff;
+      font-size: 22px;
+      color: #4A90E2;
+      margin: 6px 0;
     }
     .board {
       width: 98%;
-      max-width: 1400px;
-      height: 400px;
-      background: rgba(255, 255, 255, 0.9);
-      margin: 10px 0;
-      border-radius: 30px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      max-width: 1600px;
+      height: 500px;
+      background: #FFFFFF;
+      margin: 12px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
       position: relative;
-      border: 6px dashed #ff80ab;
+      border: 1px solid #E0E0E0;
       overflow: hidden;
+    }
+    .progress-bar {
+      width: 98%;
+      max-width: 1600px;
+      height: 12px;
+      background: #E0E0E0;
+      border-radius: 6px;
+      margin: 6px 0;
+    }
+    #progress {
+      height: 100%;
+      background: linear-gradient(to right, #B3E5FC, #B2DFDB, #B2F0B2);
+      border-radius: 6px;
+      transition: width 0.5s ease;
     }
     .tiles {
       position: relative;
@@ -112,36 +128,47 @@
     }
     .tile {
       position: absolute;
-      border-radius: 10px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px; /* Increased from 22px */
+      font-size: 36px;
       font-weight: bold;
-      color: #fff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+      background: #F0F4FF;
     }
     .tile:hover {
-      transform: scale(1.05);
+      transform: translateY(-3px);
+      box-shadow: 0 3px 6px rgba(240, 244, 255, 0.3);
     }
     .start-tile {
-      background: #ffd700;
+      background: #FFD700;
       color: #333;
-      font-size: 24px; /* Increased from 20px */
+      font-size: 30px;
+      border: 1px solid rgba(255, 215, 0, 0.5);
     }
     .sticky-tile {
-      background: #ffa500;
-      font-size: 34px; /* Increased from 28px */
+      background: #FFA500;
+      font-size: 42px;
+      border: 1px solid rgba(255, 165, 0, 0.5);
     }
     .castle-icon {
-      font-size: 42px; /* Increased from 36px */
+      font-size: 50px;
+    }
+    .active-tile {
+      box-shadow: 0 0 12px #4A90E2, 0 0 24px #357ABD;
     }
     #player {
-      font-size: 60px;
+      font-size: 72px;
       position: absolute;
-      transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+      transition: left 0.5s ease-in-out, top 0.5s ease-in-out, transform 0.5s ease-out;
       z-index: 10;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    #player.move {
+      transform: scale(1.1);
     }
     .popup {
       display: none;
@@ -149,100 +176,109 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 235, 205, 0.95);
-      border-radius: 20px;
-      padding: 20px;
-      width: 500px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+      background: #FFFFFF;
+      border-radius: 10px;
+      padding: 25px;
+      width: 600px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
       z-index: 1000;
+      animation: popIn 0.3s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     }
     .popup-content {
-      background: #fff;
-      border: 5px solid #ff80ab;
-      padding: 15px;
-      border-radius: 15px;
+      background: #FAFAFA;
+      border: 1px solid #E0E0E0;
+      padding: 18px;
+      border-radius: 6px;
       position: relative;
     }
     .popup h2 {
-      color: #ff4081;
-      font-size: 24px;
-      margin-bottom: 10px;
+      color: #4A90E2;
+      font-size: 28px;
+      margin-bottom: 12px;
+      font-weight: 500;
     }
     #answer {
       width: 90%;
-      min-height: 100px;
-      padding: 10px;
-      margin: 10px 0;
-      border: 2px solid #ff80ab;
-      border-radius: 5px;
-      font-size: 16px;
+      min-height: 120px;
+      padding: 12px;
+      margin: 12px 0;
+      border: 1px solid #E0E0E0;
+      border-radius: 6px;
+      font-size: 18px;
       font-family: 'Courier New', monospace;
-      background: #fff;
+      background: #FFFFFF;
       outline: none;
       overflow: auto;
+      user-select: text; /* Allow text selection */
+      direction: ltr; /* Force left-to-right text direction */
     }
     #answer[contenteditable]:empty:before {
       content: attr(placeholder);
       color: #aaa;
     }
     .popup-buttons button {
-      background: #bae1ff;
-      color: #333;
+      background: #4A90E2;
+      color: #FFFFFF;
       border: none;
-      padding: 8px 16px;
-      margin: 5px;
-      border-radius: 5px;
+      padding: 10px 20px;
+      margin: 6px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 16px;
       transition: background 0.3s;
     }
     .popup-buttons button:hover {
-      background: #36a2eb;
+      background: #357ABD;
     }
     .close-button {
       position: absolute;
-      top: 10px;
-      right: 15px;
+      top: 12px;
+      right: 18px;
       background: transparent;
       border: none;
-      font-size: 20px;
+      font-size: 24px;
       cursor: pointer;
       color: #888;
       transition: color 0.3s;
     }
     .close-button:hover {
-      color: #ff4081;
+      color: #4A90E2;
     }
     #message-popup .popup-content p {
       margin: 0;
-      padding: 10px 0;
+      padding: 12px 0;
       color: #555;
       white-space: pre-wrap;
+      font-size: 18px;
     }
     #final-popup .popup-content {
       text-align: center;
     }
     #final-popup .confetti {
-      font-size: 30px;
-      margin-bottom: 10px;
+      font-size: 36px;
+      margin-bottom: 12px;
     }
     #final-popup input {
       width: 80%;
-      padding: 8px;
-      margin: 10px 0;
-      border: 2px solid #ff80ab;
-      border-radius: 5px;
-      font-size: 16px;
+      padding: 10px;
+      margin: 12px 0;
+      border: 1px solid #E0E0E0;
+      border-radius: 6px;
+      font-size: 18px;
     }
     .sql-keyword {
-      color: #0000ff;
+      color: #0000FF;
       font-weight: bold;
     }
     .sql-string {
       color: #008000;
     }
     .sql-number {
-      color: #ff00ff;
+      color: #FF00FF;
     }
   </style>
 </head>
@@ -267,6 +303,7 @@
         <div id="tiles-container" class="tiles"></div>
         <div id="player">🍭</div>
       </div>
+      <div class="progress-bar"><div id="progress" style="width: 0%;"></div></div>
       <div class="controls">
         <button onclick="getQuestion('easy')">Easy Path</button>
         <button onclick="getQuestion('medium')">Medium Path</button>
@@ -311,6 +348,13 @@
     </div>
   </div>
 
+  <audio id="sticky-sound" preload="auto">
+    <source src="data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIA/+MYxDsAAABmQkVHSU4AAyAAAAAAR0lYQVQAAAAA/+MYxB8AAABQTEFZRQAAV2VsY29tZSB0byB0aGUgU29mdHdhcmUgRW5naW5lZXJpbmcgSW5zdGl0dXRlIQAA/+MYxCYAAADQTUVESVRBVElPTgAATWV0YWRhdGEgZm9yIHRoZSBTb2Z0d2FyZSBFbmdpbmVlcmluZyBJbnN0aXR1dGUAAAD/+MYxAwAAAExBTUUzAA==" type="audio/mpeg">
+  </audio>
+  <audio id="win-sound" preload="auto">
+    <source src="data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIA/+MYxDsAAABmQkVHSU4AAyAAAAAAR0lYQVQAAAAA/+MYxB8AAABQTEFZRQAAV2lubmluZyBzb3VuZCBmb3IgdGhlIFNvZnR3YXJlIEVuZ2luZWVyaW5nIEluc3RpdHV0ZQAA/+MYxCYAAADQTUVESVRBVElPTgAATWV0YWRhdGEgZm9yIHRoZSBTb2Z0d2FyZSBFbmdpbmVlcmluZyBJbnN0aXR1dGUAAAD/+MYxAwAAAExBTUUzAA==" type="audio/mpeg">
+  </audio>
+
   <script>
     const totalSpaces = 20;
     let playerPosition = 0;
@@ -319,12 +363,12 @@
     let currentQuestion = null;
     let spacesToMove = 1;
     let moveCount = 0;
-    let startTime = Date.now();
+    let startTime = null;
     let timeInterval = null;
     const scoreboard = [];
     const rows = 2, cols = 10;
-    const boardWidth = 1400 * 0.98;
-    const boardHeight = 400;
+    const boardWidth = 1600 * 0.98;
+    const boardHeight = 500;
     const tileSpacingX = boardWidth / cols;
     const tileSpacingY = boardHeight / rows;
     const tileSizeX = tileSpacingX * 0.9;
@@ -333,9 +377,8 @@
     const stickyTiles = new Set();
     let stickyAnswersNeeded = 0;
     const pastelColors = [
-      '#ffb3ba', '#bae1ff', '#baffc9', '#ffdfba', '#ffffba',
-      '#f4b3ff', '#b3ffec', '#f9b3ff', '#ffd6b3', '#b3c0ff',
-      '#ffe6b3', '#b3ffd6', '#d6b3ff', '#ffb3d9', '#b3ffe6'
+      '#F8C8DC', '#B3E5FC', '#D4A5E5', '#C8E6C9', '#FFD1B3',
+      '#E6C9F0', '#A3D8F4', '#F5C6CB', '#B2F0B2', '#FFF5B7'
     ];
     const candyIcons = ['🍬', '🍫', '🍭', '🍰', '🍪', '🍩', '🧁', '🍮', '🍦'];
 
@@ -426,7 +469,7 @@
         { question: "Find shops with sales in 'Sugarville'.", answer: "SELECT DISTINCT cs.shop_name FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Sugarville';" },
         { question: "List products with price below average.", answer: "SELECT product_name, price FROM products WHERE price < (SELECT AVG(price) FROM products);" },
         { question: "Get total sales per shop in 2024.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE s.sale_date LIKE '2024%' GROUP BY cs.shop_name;" },
-        { question: "Find products with sales in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));" },
+        { question: "Find products sold in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));" },
         { question: "List shops with more than 10 sales.", answer: "SELECT cs.shop_name, COUNT(s.sale_id) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING COUNT(s.sale_id) > 10;" },
         { question: "Get average quantity sold per product.", answer: "SELECT p.product_name, AVG(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name;" },
         { question: "Find shops with no 'Gummy' sales.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Gummy');" },
@@ -489,7 +532,7 @@
         { question: "Get shops with no sales of 'Gummy' in 2025.", answer: "SELECT cs.shop_name FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.shop_id = cs.shop_id AND p.category = 'Gummy' AND s.sale_date LIKE '2025%');" },
         { question: "Find products with sales in 'Choco Land' exceeding others.", answer: "SELECT p.product_name FROM products p JOIN sales s ON p.product_id = s.product_id JOIN candy_shops cs ON s.shop_id = cs.shop_id WHERE cs.location = 'Choco Land' GROUP BY p.product_name HAVING SUM(s.total_amount) > (SELECT SUM(s2.total_amount) FROM sales s2 JOIN candy_shops cs2 ON s2.shop_id = cs2.shop_id WHERE s2.product_id = p.product_id AND cs2.location != 'Choco Land');" },
         { question: "List shops with sales exceeding total stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT SUM(price * stock_quantity) FROM products);" },
-        { question: "Get total sales per shop in 'Gummyville'.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Gummyville' GROUP BY cs.shop_name;" }
+        { question: "Get total sales per shop in 'Gummyville'.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id WHERE cs.location = 'Gummyville' GROUP BY cs.shop_id;" }
       ]
     };
     const usedQuestions = {
@@ -505,6 +548,7 @@
       timeInterval = setInterval(updateTimer, 1000);
       loadScoreboard();
       setupSyntaxHighlighting();
+      updateProgress();
     };
 
     function generateTilePositions() {
@@ -536,6 +580,7 @@
           tile.classList.add("start-tile");
           tile.innerText = "Start";
         } else if (i === totalSpaces - 1) {
+          tile.style.background = "#FFFACD";
           tile.innerHTML = `<span class="castle-icon">🏰</span>`;
         } else {
           if (Math.random() < 0.2 && i !== 0 && i !== totalSpaces - 1) {
@@ -556,23 +601,41 @@
       hintsLeft = 3;
       moveCount = 0;
       stickyAnswersNeeded = 0;
+      startTime = Date.now(); // Reset the start time
+      if (timeInterval) clearInterval(timeInterval);
+      timeInterval = setInterval(updateTimer, 1000);
       document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
+      document.getElementById("time-display").innerText = "Time Elapsed: 0m 0s";
       placePlayer();
       closePopup();
       closeMessagePopup();
+      updateProgress();
     }
 
     function placePlayer() {
       const player = document.getElementById("player");
+      const tiles = document.querySelectorAll(".tile");
+      tiles.forEach((tile, index) => {
+        tile.classList.toggle("active-tile", index === playerPosition);
+      });
       const [x, y] = tilePositions[playerPosition];
       player.style.left = x + "px";
       player.style.top = y + "px";
+      player.classList.remove("move");
+      void player.offsetWidth;
+      player.classList.add("move");
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const progress = (playerPosition / (totalSpaces - 1)) * 100;
+      document.getElementById("progress").style.width = `${progress}%`;
     }
 
     function selectCharacter(icon) {
       playerIcon = icon;
       document.getElementById("player").innerText = icon;
-      resetPlayer();
+      placePlayer();
     }
 
     function movePlayer(spaces) {
@@ -582,17 +645,19 @@
       placePlayer();
 
       if (playerPosition === totalSpaces - 1) {
+        document.getElementById("win-sound").play();
         showFinalPopup();
       } else if (stickyTiles.has(playerPosition)) {
+        document.getElementById("sticky-sound").play();
         if (stickyAnswersNeeded === 0) {
           stickyAnswersNeeded = 2;
-          showMessage("🍯 Sticky Honey! Answer two questions correctly to move past this tile!");
+          showMessage("You are stuck on a sticky honey tile. You must answer two questions correctly to proceed.");
         } else {
           stickyAnswersNeeded--;
           if (stickyAnswersNeeded > 0) {
-            showMessage(`🍯 One more correct answer to pass the sticky honey! (${stickyAnswersNeeded} left)`);
+            showMessage(`One more correct answer is required to pass the sticky honey tile. (${stickyAnswersNeeded} left)`);
           } else {
-            showMessage("🍯 You’ve cleared the sticky honey! Move forward on your next turn.");
+            showMessage("You have successfully cleared the sticky honey tile. You may proceed on your next turn.");
           }
         }
       }
@@ -680,7 +745,7 @@
       const used = usedQuestions[difficulty];
       const available = pool.filter((q, idx) => !used.has(idx));
       if (available.length === 0) {
-        showMessage("No more questions left for this difficulty!");
+        showMessage("No more questions are available for this difficulty level.");
         return;
       }
       const randIndex = Math.floor(Math.random() * available.length);
@@ -696,7 +761,7 @@
 
     function submitAnswer() {
       if (!currentQuestion) {
-        showMessage("No question is active right now.");
+        showMessage("No question is currently active.");
         return;
       }
       const userAnswer = document.getElementById("answer").innerText.trim();
@@ -705,40 +770,40 @@
         if (stickyTiles.has(playerPosition) && stickyAnswersNeeded > 0) {
           stickyAnswersNeeded--;
           if (stickyAnswersNeeded === 0) {
-            showMessage("🎉 Correct! You’ve cleared the sticky honey! Move forward on your next turn.");
+            showMessage("Correct! You have successfully cleared the sticky honey tile. Proceed on your next turn.");
           } else {
-            showMessage(`🎉 Correct! ${stickyAnswersNeeded} more correct answer(s) to pass the sticky honey.`);
+            showMessage(`Correct! You need ${stickyAnswersNeeded} more correct answer(s) to pass the sticky honey tile.`);
           }
         } else {
-          showMessage("🎉 Correct! Moving forward.");
+          showMessage("Correct! You may now move forward.");
           movePlayer(spacesToMove);
         }
         currentQuestion = null;
       } else {
-        let feedback = "❌ Incorrect! ";
+        let feedback = "Incorrect. Please review your query: ";
         const userLower = userAnswer.toLowerCase();
         const correctLower = currentQuestion.answer.toLowerCase();
-        if (!userLower.includes("select")) feedback += "You need a SELECT clause. ";
-        if (!userLower.includes("from")) feedback += "Missing a FROM clause. ";
-        if (correctLower.includes("join") && !userLower.includes("join")) feedback += "You forgot to join a table! ";
-        if (correctLower.includes("where") && !userLower.includes("where")) feedback += "A WHERE clause is needed. ";
-        if (correctLower.includes("group by") && !userLower.includes("group by")) feedback += "Try grouping the results. ";
+        if (!userLower.includes("select")) feedback += "A SELECT statement is required. ";
+        if (!userLower.includes("from")) feedback += "A FROM clause is missing. ";
+        if (correctLower.includes("join") && !userLower.includes("join")) feedback += "A JOIN operation is necessary. ";
+        if (correctLower.includes("where") && !userLower.includes("where")) feedback += "A WHERE clause is required. ";
+        if (correctLower.includes("group by") && !userLower.includes("group by")) feedback += "Consider using GROUP BY for aggregation. ";
         showMessage(feedback);
       }
     }
 
     function showHint() {
       if (!currentQuestion) {
-        showMessage("No active question!");
+        showMessage("There is no active question to provide a hint for.");
         return;
       }
       if (hintsLeft > 0) {
         const keyCondition = currentQuestion.question.split("'")[1] || "the key condition";
-        showMessage(`Hint: Think about filtering with WHERE on '${keyCondition}'.`);
+        showMessage(`Consider using a WHERE clause to filter based on '${keyCondition}'.`);
         hintsLeft--;
         document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
       } else {
-        showMessage("No hints left!");
+        showMessage("You have exhausted all available hints.");
       }
     }
 
@@ -769,8 +834,8 @@
     function showAnswer() {
       if (!currentQuestion) return;
       showMessage(
-        `Answer: ${currentQuestion.answer}\n\n` +
-        "Explanation: This query retrieves the requested data using SQL filtering and joins as needed."
+        `Correct Answer: ${currentQuestion.answer}\n\n` +
+        "Explanation: This query retrieves the requested data by applying the necessary SQL clauses and conditions to filter and present the results accurately."
       );
       closePopup();
       currentQuestion = null;
@@ -789,6 +854,7 @@
           document.execCommand("insertHTML", false, "<br>");
         }
       });
+      // Removed paste, copy, and cut event listeners to allow copy-paste
     }
 
     function highlightSyntax() {
@@ -814,9 +880,7 @@
         try {
           selection.removeAllRanges();
           selection.addRange(range);
-        } catch (e) {
-          // Ignore cursor restoration errors
-        }
+        } catch (e) {}
       }
     }
 
