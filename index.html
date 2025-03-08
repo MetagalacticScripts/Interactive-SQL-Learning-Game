@@ -19,7 +19,7 @@
     }
     .container {
       display: flex;
-      flex-direction: column; /* Default for mobile: main-content first, then sidebar */
+      flex-direction: column;
       min-height: 100vh;
       box-sizing: border-box;
     }
@@ -30,7 +30,7 @@
       padding: 2vh;
       box-sizing: border-box;
       box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
-      order: 2; /* Ensure sidebar comes after main-content on mobile */
+      order: 2;
       overflow-y: auto;
       max-height: 40vh;
     }
@@ -41,7 +41,7 @@
       align-items: center;
       padding: 2vh;
       box-sizing: border-box;
-      order: 1; /* Main content first on mobile */
+      order: 1;
       overflow-y: auto;
     }
     h2, h3 {
@@ -282,7 +282,7 @@
     }
     @media (min-width: 768px) {
       .container {
-        flex-direction: row-reverse; /* Desktop: main-content on the left, sidebar on the right */
+        flex-direction: row-reverse;
       }
       .sidebar {
         width: 25vw;
@@ -290,10 +290,10 @@
         border-left: 1px solid #E0E0E0;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
         max-height: none;
-        order: 0; /* Reset order for desktop */
+        order: 0;
       }
       .main-content {
-        order: 0; /* Reset order for desktop */
+        order: 0;
       }
       .board {
         width: 70vw;
@@ -303,12 +303,12 @@
         width: 70vw;
       }
       .tiles {
-        grid-template-columns: repeat(5, 1fr); /* Fixed number of columns for better control */
-        grid-template-rows: repeat(4, 1fr); /* 4 rows to fit 20 tiles */
-        gap: 1vh; /* Slightly larger gap for better spacing */
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        gap: 1vh;
       }
       .tile {
-        font-size: clamp(2rem, 5vw, 3rem); /* Larger tiles on desktop */
+        font-size: clamp(2rem, 5vw, 3rem);
       }
       .start-tile {
         font-size: clamp(1.5rem, 4vw, 2rem);
@@ -720,13 +720,6 @@
         if (stickyAnswersNeeded === 0) {
           stickyAnswersNeeded = 2;
           showMessage("You are stuck on a sticky honey tile. You must answer two questions correctly to proceed.");
-        } else {
-          stickyAnswersNeeded--;
-          if (stickyAnswersNeeded > 0) {
-            showMessage(`One more correct answer is required to pass the sticky honey tile. (${stickyAnswersNeeded} left)`);
-          } else {
-            showMessage("You have successfully cleared the sticky honey tile. You may proceed on your next turn.");
-          }
         }
       }
     }
@@ -771,14 +764,15 @@
     }
 
     function getQuestion(difficulty) {
-      if (stickyAnswersNeeded > 0) {
-        showMessage("You must clear the sticky honey tile by answering questions correctly before moving further.");
-        return;
-      }
       if (playerPosition >= totalSpaces - 1) {
         showMessage("You have already reached the Candy Castle!");
         return;
       }
+
+      // Set spaces to move based on difficulty
+      spacesToMove = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
+
+      // Select a question
       const pool = sqlQuestions[difficulty];
       const used = usedQuestions[difficulty];
       const available = pool.filter((q, idx) => !used.has(idx));
@@ -790,10 +784,11 @@
       currentQuestion = available[randIndex];
       const originalIndex = pool.indexOf(currentQuestion);
       used.add(originalIndex);
-      spacesToMove = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
+
+      // Display the question
       document.getElementById("question-text").innerText = currentQuestion.question;
       const answerDiv = document.getElementById("answer");
-      answerDiv.innerHTML = ""; // Clear the answer field
+      answerDiv.innerHTML = "";
       answerDiv.focus();
       document.getElementById("question-popup").style.display = "block";
     }
@@ -807,7 +802,6 @@
           .replace(/'[^']*'/gi, '<span class="sql-string">$&</span>')
           .replace(/\b\d+(\.\d+)?\b/gi, '<span class="sql-number">$&</span>');
         this.innerHTML = highlighted;
-        // Move cursor to end
         const range = document.createRange();
         const sel = window.getSelection();
         range.selectNodeContents(this);
@@ -830,15 +824,18 @@
           stickyAnswersNeeded--;
           if (stickyAnswersNeeded > 0) {
             showMessage(`Correct! One more correct answer is required to pass the sticky honey tile. (${stickyAnswersNeeded} left)`);
+            closePopup();
+            getQuestion(getCurrentDifficulty());
           } else {
             showMessage("Correct! You have cleared the sticky honey tile. You may proceed on your next turn.");
+            closePopup();
           }
         } else {
           movePlayer(spacesToMove);
           showMessage("Correct! You moved forward!");
+          closePopup();
         }
         currentQuestion = null;
-        closePopup();
       } else {
         showMessage("Incorrect answer. Try again or use a hint!");
       }
@@ -862,28 +859,28 @@
     function showDatabaseSchema() {
       showMessage(
         `<pre style="font-size: clamp(0.7rem, 2.5vw, 0.9rem); line-height: 1.5; white-space: pre-wrap; margin: 0;">
-<span style="color: #4A90E2; font-weight: bold;">candy_shops</span>
-shop_id INT PRIMARY KEY
-shop_name VARCHAR(100) NOT NULL
-location VARCHAR(100)
-rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)
+candy_shops
+  shop_id INT PRIMARY KEY
+  shop_name VARCHAR(100) NOT NULL
+  location VARCHAR(100)
+  rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)
 
-<span style="color: #4A90E2; font-weight: bold;">products</span>
-product_id INT PRIMARY KEY
-product_name VARCHAR(100) NOT NULL
-category VARCHAR(50)
-price DECIMAL(10,2)
-stock_quantity INT
+products
+  product_id INT PRIMARY KEY
+  product_name VARCHAR(100) NOT NULL
+  category VARCHAR(50)
+  price DECIMAL(10,2)
+  stock_quantity INT
 
-<span style="color: #4A90E2; font-weight: bold;">sales</span>
-sale_id INT PRIMARY KEY
-shop_id INT
-product_id INT
-sale_date DATE
-quantity_sold INT
-total_amount DECIMAL(10,2)
-FOREIGN KEY (shop_id) REFERENCES candy_shops(shop_id)
-FOREIGN KEY (product_id) REFERENCES products(product_id)
+sales
+  sale_id INT PRIMARY KEY
+  shop_id INT
+  product_id INT
+  sale_date DATE
+  quantity_sold INT
+  total_amount DECIMAL(10,2)
+  FOREIGN KEY (shop_id) REFERENCES candy_shops(shop_id)
+  FOREIGN KEY (product_id) REFERENCES products(product_id)
         </pre>`
       );
     }
@@ -895,9 +892,7 @@ FOREIGN KEY (product_id) REFERENCES products(product_id)
       }
       const difficulty = getCurrentDifficulty();
       showMessage(`The correct answer is:\n${currentQuestion.answer}`);
-      // Clear the current question to prevent copying
       currentQuestion = null;
-      // Load a new question of the same difficulty
       setTimeout(() => {
         getNewQuestion(difficulty);
       }, 0);
@@ -923,7 +918,7 @@ FOREIGN KEY (product_id) REFERENCES products(product_id)
       used.add(originalIndex);
       document.getElementById("question-text").innerText = currentQuestion.question;
       const answerDiv = document.getElementById("answer");
-      answerDiv.innerHTML = ""; // Clear the answer field
+      answerDiv.innerHTML = "";
       answerDiv.focus();
       document.getElementById("question-popup").style.display = "block";
     }
