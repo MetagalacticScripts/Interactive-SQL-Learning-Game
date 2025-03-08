@@ -410,6 +410,7 @@
     let tilePositions = [];
     const stickyTiles = new Set();
     let stickyAnswersNeeded = 0;
+    let currentDifficulty = 'easy';
     const pastelColors = [
       '#F8C8DC', '#B3E5FC', '#D4A5E5', '#C8E6C9', '#FFD1B3',
       '#E6C9F0', '#A3D8F4', '#F5C6CB', '#B2F0B2', '#FFF5B7'
@@ -677,6 +678,9 @@
       closePopup();
       closeMessagePopup();
       updateProgress();
+      usedQuestions.easy.clear();
+      usedQuestions.medium.clear();
+      usedQuestions.advanced.clear();
     }
 
     function placePlayer() {
@@ -720,6 +724,7 @@
         if (stickyAnswersNeeded === 0) {
           stickyAnswersNeeded = 2;
           showMessage("You are stuck on a sticky honey tile. You must answer two questions correctly to proceed.");
+          setTimeout(() => getQuestion(currentDifficulty), 1000);
         }
       }
     }
@@ -769,23 +774,26 @@
         return;
       }
 
-      // Set spaces to move based on difficulty
+      currentDifficulty = difficulty;
       spacesToMove = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
 
-      // Select a question
       const pool = sqlQuestions[difficulty];
       const used = usedQuestions[difficulty];
       const available = pool.filter((q, idx) => !used.has(idx));
       if (available.length === 0) {
-        showMessage("No more questions are available for this difficulty level.");
+        used.clear();
+        showMessage("All questions for this difficulty have been used. Resetting question pool.");
+      }
+      const updatedAvailable = pool.filter((q, idx) => !used.has(idx));
+      if (updatedAvailable.length === 0) {
+        showMessage("Error: No questions available after reset.");
         return;
       }
-      const randIndex = Math.floor(Math.random() * available.length);
-      currentQuestion = available[randIndex];
+      const randIndex = Math.floor(Math.random() * updatedAvailable.length);
+      currentQuestion = updatedAvailable[randIndex];
       const originalIndex = pool.indexOf(currentQuestion);
       used.add(originalIndex);
 
-      // Display the question
       document.getElementById("question-text").innerText = currentQuestion.question;
       const answerDiv = document.getElementById("answer");
       answerDiv.innerHTML = "";
@@ -820,22 +828,19 @@
       const userAnswer = answerDiv.innerText.trim();
       const correctAnswer = currentQuestion.answer.trim();
       if (userAnswer === correctAnswer) {
+        closePopup();
         if (stickyAnswersNeeded > 0) {
           stickyAnswersNeeded--;
           if (stickyAnswersNeeded > 0) {
             showMessage(`Correct! One more correct answer is required to pass the sticky honey tile. (${stickyAnswersNeeded} left)`);
-            closePopup();
-            getQuestion(getCurrentDifficulty());
+            setTimeout(() => getQuestion(currentDifficulty), 1000);
           } else {
             showMessage("Correct! You have cleared the sticky honey tile. You may proceed on your next turn.");
-            closePopup();
           }
         } else {
           movePlayer(spacesToMove);
           showMessage("Correct! You moved forward!");
-          closePopup();
         }
-        currentQuestion = null;
       } else {
         showMessage("Incorrect answer. Try again or use a hint!");
       }
@@ -858,30 +863,26 @@
 
     function showDatabaseSchema() {
       showMessage(
-        `<pre style="font-size: clamp(0.7rem, 2.5vw, 0.9rem); line-height: 1.5; white-space: pre-wrap; margin: 0;">
-candy_shops
-  shop_id INT PRIMARY KEY
-  shop_name VARCHAR(100) NOT NULL
-  location VARCHAR(100)
-  rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)
-
-products
-  product_id INT PRIMARY KEY
-  product_name VARCHAR(100) NOT NULL
-  category VARCHAR(50)
-  price DECIMAL(10,2)
-  stock_quantity INT
-
-sales
-  sale_id INT PRIMARY KEY
-  shop_id INT
-  product_id INT
-  sale_date DATE
-  quantity_sold INT
-  total_amount DECIMAL(10,2)
-  FOREIGN KEY (shop_id) REFERENCES candy_shops(shop_id)
-  FOREIGN KEY (product_id) REFERENCES products(product_id)
-        </pre>`
+        "candy_shops\n" +
+        "  shop_id: INT PRIMARY KEY\n" +
+        "  shop_name: VARCHAR(100) NOT NULL\n" +
+        "  location: VARCHAR(100)\n" +
+        "  rating: DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)\n\n" +
+        "products\n" +
+        "  product_id: INT PRIMARY KEY\n" +
+        "  product_name: VARCHAR(100) NOT NULL\n" +
+        "  category: VARCHAR(50)\n" +
+        "  price: DECIMAL(10,2)\n" +
+        "  stock_quantity: INT\n\n" +
+        "sales\n" +
+        "  sale_id: INT PRIMARY KEY\n" +
+        "  shop_id: INT\n" +
+        "  product_id: INT\n" +
+        "  sale_date: DATE\n" +
+        "  quantity_sold: INT\n" +
+        "  total_amount: DECIMAL(10,2)\n" +
+        "  FOREIGN KEY (shop_id) REFERENCES candy_shops(shop_id)\n" +
+        "  FOREIGN KEY (product_id) REFERENCES products(product_id)"
       );
     }
 
@@ -890,37 +891,9 @@ sales
         showMessage("There is no active question to show the answer for.");
         return;
       }
-      const difficulty = getCurrentDifficulty();
       showMessage(`The correct answer is:\n${currentQuestion.answer}`);
-      currentQuestion = null;
-      setTimeout(() => {
-        getNewQuestion(difficulty);
-      }, 0);
-    }
-
-    function getCurrentDifficulty() {
-      if (spacesToMove === 1) return "easy";
-      if (spacesToMove === 2) return "medium";
-      return "advanced";
-    }
-
-    function getNewQuestion(difficulty) {
-      const pool = sqlQuestions[difficulty];
-      const used = usedQuestions[difficulty];
-      const available = pool.filter((q, idx) => !used.has(idx));
-      if (available.length === 0) {
-        showMessage("No more questions are available for this difficulty level.");
-        return;
-      }
-      const randIndex = Math.floor(Math.random() * available.length);
-      currentQuestion = available[randIndex];
-      const originalIndex = pool.indexOf(currentQuestion);
-      used.add(originalIndex);
-      document.getElementById("question-text").innerText = currentQuestion.question;
-      const answerDiv = document.getElementById("answer");
-      answerDiv.innerHTML = "";
-      answerDiv.focus();
-      document.getElementById("question-popup").style.display = "block";
+      closePopup();
+      setTimeout(() => getQuestion(currentDifficulty), 1000);
     }
 
     function showMessage(message) {
