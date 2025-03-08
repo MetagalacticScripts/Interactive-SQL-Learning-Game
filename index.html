@@ -442,62 +442,475 @@
     ];
     const candyIcons = ['🍬', '🍫', '🍭', '🍰', '🍪', '🍩', '🧁', '🍮', '🍦'];
 
-    const sqlQuestions = {
-      easy: [
-        { question: "Find all candy shops in 'Candyland'.", answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';", result: { columns: ['shop_id', 'shop_name', 'location', 'rating'], rows: [{ shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 }] } },
-        { question: "List all products with a price less than $5.", answer: "SELECT * FROM products WHERE price < 5;", result: { columns: ['product_id', 'product_name', 'category', 'price', 'stock_quantity'], rows: [
+  const sqlQuestions = {
+  easy: [
+    // 1.
+    {
+      question: "Select all candy shops.",
+      answer: "SELECT * FROM candy_shops;",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
+          { shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 },
+          { shop_id: 2, shop_name: "Sugar Delight", location: "Sugarville", rating: 3.8 },
+          { shop_id: 3, shop_name: "Choco Bliss", location: "Choco Land", rating: 4.9 },
+          { shop_id: 4, shop_name: "Gummy World", location: "Gummyville", rating: 3.2 },
+          { shop_id: 5, shop_name: "Sweet Shop", location: "Sweet Town", rating: 4.0 }
+        ]
+      }
+    },
+    // 2.
+    {
+      question: "Select all products.",
+      answer: "SELECT * FROM products;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
           { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
           { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 },
           { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 },
           { product_id: 4, product_name: "Hard Candy", category: "Hard Candy", price: 0.50, stock_quantity: 100 },
           { product_id: 5, product_name: "Caramel Chew", category: "Caramel", price: 1.25, stock_quantity: 75 }
-        ]} },
-        { question: "Get all sales from '2025-03-01'.", answer: "SELECT * FROM sales WHERE sale_date = '2025-03-01';", result: { columns: ['sale_id', 'shop_id', 'product_id', 'sale_date', 'quantity_sold', 'total_amount'], rows: [{ sale_id: 1, shop_id: 1, product_id: 1, sale_date: "2025-03-01", quantity_sold: 10, total_amount: 15.00 }] } },
-        { question: "Select all products with stock quantity above 100.", answer: "SELECT * FROM products WHERE stock_quantity > 100;", result: { columns: ['product_id', 'product_name', 'category', 'price', 'stock_quantity'], rows: [
+        ]
+      }
+    },
+    // 3.
+    {
+      question: "Select all sales records.",
+      answer: "SELECT * FROM sales;",
+      result: {
+        columns: ["sale_id", "shop_id", "product_id", "sale_date", "quantity_sold", "total_amount"],
+        rows: [
+          { sale_id: 1, shop_id: 1, product_id: 1, sale_date: "2025-03-01", quantity_sold: 10, total_amount: 15.00 },
+          { sale_id: 2, shop_id: 2, product_id: 2, sale_date: "2025-03-02", quantity_sold: 15, total_amount: 30.00 },
+          { sale_id: 3, shop_id: 3, product_id: 3, sale_date: "2025-03-03", quantity_sold: 20, total_amount: 15.00 },
+          { sale_id: 4, shop_id: 1, product_id: 4, sale_date: "2025-03-04", quantity_sold: 50, total_amount: 25.00 },
+          { sale_id: 5, shop_id: 4, product_id: 5, sale_date: "2025-03-05", quantity_sold: 30, total_amount: 37.50 }
+        ]
+      }
+    },
+    // 4.
+    {
+      question: "Find candy shops in Candyland.",
+      answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
+          { shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 }
+        ]
+      }
+    },
+    // 5.
+    {
+      question: "Find candy shops in Sugarville.",
+      answer: "SELECT * FROM candy_shops WHERE location = 'Sugarville';",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
+          { shop_id: 2, shop_name: "Sugar Delight", location: "Sugarville", rating: 3.8 }
+        ]
+      }
+    },
+    // 6.
+    {
+      question: "Select products with price less than 2.",
+      answer: "SELECT * FROM products WHERE price < 2;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
+          { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 },
+          { product_id: 4, product_name: "Hard Candy", category: "Hard Candy", price: 0.50, stock_quantity: 100 },
+          { product_id: 5, product_name: "Caramel Chew", category: "Caramel", price: 1.25, stock_quantity: 75 }
+        ]
+      }
+    },
+    // 7.
+    {
+      question: "Select products with stock_quantity greater than 100.",
+      answer: "SELECT * FROM products WHERE stock_quantity > 100;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
           { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
           { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 },
           { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 }
-        ]} },
-        { question: "List shops with a rating of 4 or higher.", answer: "SELECT * FROM candy_shops WHERE rating >= 4;", result: { columns: ['shop_id', 'shop_name', 'location', 'rating'], rows: [
+        ]
+      }
+    },
+    // 8.
+    {
+      question: "Select sales on 2025-03-01.",
+      answer: "SELECT * FROM sales WHERE sale_date = '2025-03-01';",
+      result: {
+        columns: ["sale_id", "shop_id", "product_id", "sale_date", "quantity_sold", "total_amount"],
+        rows: [
+          { sale_id: 1, shop_id: 1, product_id: 1, sale_date: "2025-03-01", quantity_sold: 10, total_amount: 15.00 }
+        ]
+      }
+    },
+    // 9.
+    {
+      question: "Select products with price equal to 2.00.",
+      answer: "SELECT * FROM products WHERE price = 2.00;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 }
+        ]
+      }
+    },
+    // 10.
+    {
+      question: "Select products in the Chocolate category.",
+      answer: "SELECT * FROM products WHERE category = 'Chocolate';",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 }
+        ]
+      }
+    },
+    // 11.
+    {
+      question: "Select sales with quantity_sold equal to 15.",
+      answer: "SELECT * FROM sales WHERE quantity_sold = 15;",
+      result: {
+        columns: ["sale_id", "shop_id", "product_id", "sale_date", "quantity_sold", "total_amount"],
+        rows: [
+          { sale_id: 2, shop_id: 2, product_id: 2, sale_date: "2025-03-02", quantity_sold: 15, total_amount: 30.00 }
+        ]
+      }
+    },
+    // 12.
+    {
+      question: "Select product names from products.",
+      answer: "SELECT product_name FROM products;",
+      result: {
+        columns: ["product_name"],
+        rows: [
+          { product_name: "Lollipop" },
+          { product_name: "Chocolate Bar" },
+          { product_name: "Gummy Bears" },
+          { product_name: "Hard Candy" },
+          { product_name: "Caramel Chew" }
+        ]
+      }
+    },
+    // 13.
+    {
+      question: "Select candy shop names from candy_shops.",
+      answer: "SELECT shop_name FROM candy_shops;",
+      result: {
+        columns: ["shop_name"],
+        rows: [
+          { shop_name: "Candy Haven" },
+          { shop_name: "Sugar Delight" },
+          { shop_name: "Choco Bliss" },
+          { shop_name: "Gummy World" },
+          { shop_name: "Sweet Shop" }
+        ]
+      }
+    },
+    // 14.
+    {
+      question: "Select sale dates from sales.",
+      answer: "SELECT sale_date FROM sales;",
+      result: {
+        columns: ["sale_date"],
+        rows: [
+          { sale_date: "2025-03-01" },
+          { sale_date: "2025-03-02" },
+          { sale_date: "2025-03-03" },
+          { sale_date: "2025-03-04" },
+          { sale_date: "2025-03-05" }
+        ]
+      }
+    },
+    // 15.
+    {
+      question: "Select candy shop names ordered by shop_name ASC.",
+      answer: "SELECT * FROM candy_shops ORDER BY shop_name ASC;",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
           { shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 },
           { shop_id: 3, shop_name: "Choco Bliss", location: "Choco Land", rating: 4.9 },
-          { shop_id: 5, shop_name: "Sweet Shop", location: "Sweet Town", rating: 4.0 }
-        ]} }
-      ],
-      medium: [
-        { question: "Find total quantity sold per product.", answer: "SELECT p.product_name, SUM(s.quantity_sold) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name;", result: { columns: ['product_name', 'SUM(s.quantity_sold)'], rows: [
-          { product_name: "Lollipop", 'SUM(s.quantity_sold)': 10 },
-          { product_name: "Chocolate Bar", 'SUM(s.quantity_sold)': 15 },
-          { product_name: "Gummy Bears", 'SUM(s.quantity_sold)': 20 },
-          { product_name: "Hard Candy", 'SUM(s.quantity_sold)': 50 },
-          { product_name: "Caramel Chew", 'SUM(s.quantity_sold)': 30 }
-        ]} },
-        { question: "List shops and their total sales amount.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name;", result: { columns: ['shop_name', 'SUM(s.total_amount)'], rows: [
-          { shop_name: "Candy Haven", 'SUM(s.total_amount)': 40.00 },
-          { shop_name: "Sugar Delight", 'SUM(s.total_amount)': 30.00 },
-          { shop_name: "Choco Bliss", 'SUM(s.total_amount)': 15.00 },
-          { shop_name: "Gummy World", 'SUM(s.total_amount)': 37.50 }
-        ]} },
-        { question: "Get products with average sale amount over $20.", answer: "SELECT p.product_name, AVG(s.total_amount) FROM products p JOIN sales s ON p.product_id = s.product_id GROUP BY p.product_name HAVING AVG(s.total_amount) > 20;", result: { columns: ['product_name', 'AVG(s.total_amount)'], rows: [] } },
-        { question: "Find top 3 highest-priced products.", answer: "SELECT product_name, price FROM products ORDER BY price DESC LIMIT 3;", result: { columns: ['product_name', 'price'], rows: [
-          { product_name: "Chocolate Bar", price: 2.00 },
-          { product_name: "Lollipop", price: 1.50 },
-          { product_name: "Caramel Chew", price: 1.25 }
-        ]} },
-        { question: "List shops with no sales in 2025.", answer: "SELECT shop_name FROM candy_shops WHERE shop_id NOT IN (SELECT shop_id FROM sales WHERE sale_date LIKE '2025%');", result: { columns: ['shop_name'], rows: [] } }
-      ],
-      advanced: [
-        { question: "Find the most popular product per shop by quantity sold.", answer: "SELECT cs.shop_name, p.product_name, SUM(s.quantity_sold) as total_sold FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.product_name HAVING total_sold = (SELECT SUM(s2.quantity_sold) FROM sales s2 WHERE s2.shop_id = cs.shop_id GROUP BY s2.product_id ORDER BY SUM(s2.quantity_sold) DESC LIMIT 1);", result: { columns: ['shop_name', 'product_name', 'total_sold'], rows: [
-          { shop_name: "Candy Haven", product_name: "Hard Candy", total_sold: 50 },
-          { shop_name: "Sugar Delight", product_name: "Chocolate Bar", total_sold: 15 },
-          { shop_name: "Choco Bliss", product_name: "Gummy Bears", total_sold: 20 },
-          { shop_name: "Gummy World", product_name: "Caramel Chew", total_sold: 30 }
-        ]} },
-        { question: "List shops with sales exceeding average stock value.", answer: "SELECT cs.shop_name, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id GROUP BY cs.shop_name HAVING SUM(s.total_amount) > (SELECT AVG(p.price * p.stock_quantity) FROM products p JOIN sales s2 ON p.product_id = s2.product_id WHERE s2.shop_id = cs.shop_id GROUP BY s2.shop_id);", result: { columns: ['shop_name', 'SUM(s.total_amount)'], rows: [] } },
-        { question: "Find products sold in all shops.", answer: "SELECT p.product_name FROM products p WHERE NOT EXISTS (SELECT cs.shop_id FROM candy_shops cs WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.shop_id = cs.shop_id AND s.product_id = p.product_id));", result: { columns: ['product_name'], rows: [] } },
-        { question: "Get shops with above-average sales per category.", answer: "SELECT cs.shop_name, p.category, SUM(s.total_amount) FROM candy_shops cs JOIN sales s ON cs.shop_id = s.shop_id JOIN products p ON s.product_id = p.product_id GROUP BY cs.shop_name, p.category HAVING SUM(s.total_amount) > (SELECT AVG(SUM(s2.total_amount)) FROM sales s2 JOIN products p2 ON s2.product_id = p2.product_id WHERE p2.category = p.category GROUP BY s2.shop_id);", result: { columns: ['shop_name', 'category', 'SUM(s.total_amount)'], rows: [] } }
-      ]
-    };
+          { shop_id: 4, shop_name: "Gummy World", location: "Gummyville", rating: 3.2 },
+          { shop_id: 5, shop_name: "Sweet Shop", location: "Sweet Town", rating: 4.0 },
+          { shop_id: 2, shop_name: "Sugar Delight", location: "Sugarville", rating: 3.8 }
+        ]
+      }
+    },
+    // 16.
+    {
+      question: "Select products ordered by product_name DESC.",
+      answer: "SELECT product_name FROM products ORDER BY product_name DESC;",
+      result: {
+        columns: ["product_name"],
+        rows: [
+          { product_name: "Lollipop" },
+          { product_name: "Hard Candy" },
+          { product_name: "Gummy Bears" },
+          { product_name: "Chocolate Bar" },
+          { product_name: "Caramel Chew" }
+        ]
+      }
+    },
+    // 17.
+    {
+      question: "Select products with stock_quantity <= 150.",
+      answer: "SELECT * FROM products WHERE stock_quantity <= 150;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
+          { product_id: 4, product_name: "Hard Candy", category: "Hard Candy", price: 0.50, stock_quantity: 100 },
+          { product_id: 5, product_name: "Caramel Chew", category: "Caramel", price: 1.25, stock_quantity: 75 }
+        ]
+      }
+    },
+    // 18.
+    {
+      question: "Select sale IDs for sales where quantity_sold >= 15.",
+      answer: "SELECT sale_id FROM sales WHERE quantity_sold >= 15;",
+      result: {
+        columns: ["sale_id"],
+        rows: [
+          { sale_id: 2 },
+          { sale_id: 3 },
+          { sale_id: 4 },
+          { sale_id: 5 }
+        ]
+      }
+    },
+    // 19.
+    {
+      question: "Select product names where stock_quantity >= 200.",
+      answer: "SELECT product_name FROM products WHERE stock_quantity >= 200;",
+      result: {
+        columns: ["product_name"],
+        rows: [
+          { product_name: "Chocolate Bar" }
+        ]
+      }
+    },
+    // 20.
+    {
+      question: "Select sale dates ordered by sale_date ASC.",
+      answer: "SELECT sale_date FROM sales ORDER BY sale_date ASC;",
+      result: {
+        columns: ["sale_date"],
+        rows: [
+          { sale_date: "2025-03-01" },
+          { sale_date: "2025-03-02" },
+          { sale_date: "2025-03-03" },
+          { sale_date: "2025-03-04" },
+          { sale_date: "2025-03-05" }
+        ]
+      }
+    }
+  ],
+  advanced: [
+    {
+      question: "Find the average price of all products.",
+      answer: "SELECT AVG(price) AS average_price FROM products GROUP BY 1;",
+      result: {
+        columns: ["average_price"],
+        rows: [
+          { average_price: 1.2 }
+        ]
+      }
+    },
+    {
+      question: "Find the total quantity sold in sales.",
+      answer: "SELECT SUM(quantity_sold) AS total_quantity FROM sales GROUP BY 1;",
+      result: {
+        columns: ["total_quantity"],
+        rows: [
+          { total_quantity: 125 }
+        ]
+      }
+    },
+    {
+      question: "Find the total sales amount from all sales.",
+      answer: "SELECT SUM(total_amount) AS total_sales FROM sales GROUP BY 1;",
+      result: {
+        columns: ["total_sales"],
+        rows: [
+          { total_sales: 122.5 }
+        ]
+      }
+    },
+    {
+      question: "Find the candy shop with the highest rating.",
+      answer: "SELECT * FROM candy_shops ORDER BY rating DESC LIMIT 1;",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
+          { shop_id: 3, shop_name: "Choco Bliss", location: "Choco Land", rating: 4.9 }
+        ]
+      }
+    },
+    {
+      question: "Find the candy shop with the lowest rating.",
+      answer: "SELECT * FROM candy_shops ORDER BY rating ASC LIMIT 1;",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
+          { shop_id: 4, shop_name: "Gummy World", location: "Gummyville", rating: 3.2 }
+        ]
+      }
+    },
+    {
+      question: "Find the most expensive product.",
+      answer: "SELECT * FROM products ORDER BY price DESC LIMIT 1;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 }
+        ]
+      }
+    },
+    {
+      question: "Find the least expensive product.",
+      answer: "SELECT * FROM products ORDER BY price ASC LIMIT 1;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 4, product_name: "Hard Candy", category: "Hard Candy", price: 0.50, stock_quantity: 100 }
+        ]
+      }
+    },
+    {
+      question: "Find the average rating of candy shops.",
+      answer: "SELECT AVG(rating) AS average_rating FROM candy_shops GROUP BY 1;",
+      result: {
+        columns: ["average_rating"],
+        rows: [
+          { average_rating: 4.08 }
+        ]
+      }
+    },
+    {
+      question: "List products ordered by price DESC.",
+      answer: "SELECT * FROM products ORDER BY price DESC;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 2, product_name: "Chocolate Bar", category: "Chocolate", price: 2.00, stock_quantity: 200 },
+          { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 },
+          { product_id: 5, product_name: "Caramel Chew", category: "Caramel", price: 1.25, stock_quantity: 75 },
+          { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 },
+          { product_id: 4, product_name: "Hard Candy", category: "Hard Candy", price: 0.50, stock_quantity: 100 }
+        ]
+      }
+    },
+    {
+      question: "List candy shops ordered by rating DESC.",
+      answer: "SELECT * FROM candy_shops ORDER BY rating DESC;",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
+          { shop_id: 3, shop_name: "Choco Bliss", location: "Choco Land", rating: 4.9 },
+          { shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 },
+          { shop_id: 5, shop_name: "Sweet Shop", location: "Sweet Town", rating: 4.0 },
+          { shop_id: 2, shop_name: "Sugar Delight", location: "Sugarville", rating: 3.8 },
+          { shop_id: 4, shop_name: "Gummy World", location: "Gummyville", rating: 3.2 }
+        ]
+      }
+    },
+    {
+      question: "Find the product with the maximum stock_quantity.",
+      answer: "SELECT * FROM products ORDER BY stock_quantity DESC LIMIT 1;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 3, product_name: "Gummy Bears", category: "Gummy", price: 0.75, stock_quantity: 300 }
+        ]
+      }
+    },
+    {
+      question: "Find the product with the minimum stock_quantity.",
+      answer: "SELECT * FROM products ORDER BY stock_quantity ASC LIMIT 1;",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 5, product_name: "Caramel Chew", category: "Caramel", price: 1.25, stock_quantity: 75 }
+        ]
+      }
+    },
+    {
+      question: "Find the sale with the highest total_amount.",
+      answer: "SELECT * FROM sales ORDER BY total_amount DESC LIMIT 1;",
+      result: {
+        columns: ["sale_id", "shop_id", "product_id", "sale_date", "quantity_sold", "total_amount"],
+        rows: [
+          { sale_id: 5, shop_id: 4, product_id: 5, sale_date: "2025-03-05", quantity_sold: 30, total_amount: 37.50 }
+        ]
+      }
+    },
+    {
+      question: "Find the sale with the lowest total_amount.",
+      answer: "SELECT * FROM sales ORDER BY total_amount ASC LIMIT 1;",
+      result: {
+        columns: ["sale_id", "shop_id", "product_id", "sale_date", "quantity_sold", "total_amount"],
+        rows: [
+          { sale_id: 1, shop_id: 1, product_id: 1, sale_date: "2025-03-01", quantity_sold: 10, total_amount: 15.00 }
+        ]
+      }
+    },
+    {
+      question: "Select the candy shop with the second highest rating.",
+      answer: "SELECT * FROM candy_shops ORDER BY rating DESC LIMIT 1 OFFSET 1;",
+      result: {
+        columns: ["shop_id", "shop_name", "location", "rating"],
+        rows: [
+          { shop_id: 1, shop_name: "Candy Haven", location: "Candyland", rating: 4.5 }
+        ]
+      }
+    },
+    {
+      question: "Select the product with the second highest price.",
+      answer: "SELECT * FROM products WHERE price = (SELECT MAX(price) FROM products WHERE price < (SELECT MAX(price) FROM products));",
+      result: {
+        columns: ["product_id", "product_name", "category", "price", "stock_quantity"],
+        rows: [
+          { product_id: 1, product_name: "Lollipop", category: "Lollipop", price: 1.50, stock_quantity: 150 }
+        ]
+      }
+    },
+    {
+      question: "Find the product count in each category.",
+      answer: "SELECT category, COUNT(*) AS count FROM products GROUP BY category;",
+      result: {
+        columns: ["category", "count"],
+        rows: [
+          { category: "Lollipop", count: 1 },
+          { category: "Chocolate", count: 1 },
+          { category: "Gummy", count: 1 },
+          { category: "Hard Candy", count: 1 },
+          { category: "Caramel", count: 1 }
+        ]
+      }
+    },
+    {
+      question: "Find the total sales for each candy shop.",
+      answer: "SELECT shop_id, SUM(total_amount) AS total_sales FROM sales GROUP BY shop_id;",
+      result: {
+        columns: ["shop_id", "total_sales"],
+        rows: [
+          { shop_id: 1, total_sales: 40.00 }, // 15 + 25
+          { shop_id: 2, total_sales: 30.00 },
+          { shop_id: 3, total_sales: 15.00 },
+          { shop_id: 4, total_sales: 37.50 }
+          // shop_id 5 has no sales.
+        ]
+      }
+    }
+  ]
+};
+
     const usedQuestions = {
       easy: new Set(),
       medium: new Set(),
