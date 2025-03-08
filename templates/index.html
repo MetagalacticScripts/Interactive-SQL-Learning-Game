@@ -1,47 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Candy Quest 🍬</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8">
+  <title>SQL Candy Quest 🍭</title>
+  <style>
+    /* =======================
+       Global Styles
+       ======================= */
+    body {
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: radial-gradient(circle, #ffe6f2, #ffeef8, #fff);
+      color: #333;
+    }
+    h1 {
+      font-size: 50px;
+      color: #ff4081;
+      text-shadow: 2px 2px #fff;
+      margin: 10px 0;
+    }
+    h2 {
+      font-size: 28px;
+      color: #ff4081;
+      text-shadow: 1px 1px #fff;
+      margin-bottom: 20px;
+    }
+    h3 {
+      color: #ff4081;
+      font-size: 22px;
+      margin: 10px 0;
+    }
+
+    /* =======================
+       Character Select
+       ======================= */
+    .character-select button {
+      background: #ff80ab;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      margin: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s;
+    }
+    .character-select button:hover {
+      background: #ff4081;
+    }
+
+    /* =======================
+       Game Board
+       ======================= */
+    .board {
+      width: 900px;
+      height: 700px;
+      background: rgba(255, 255, 255, 0.9);
+      margin: 30px auto;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      border: 6px dashed #ff80ab;
+    }
+    .tiles {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* =======================
+       Tiles
+       ======================= */
+    .tile {
+      width: 100px;
+      height: 100px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: bold;
+      color: #fff;
+      position: absolute;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+    }
+    .tile:hover {
+      transform: scale(1.05);
+    }
+    /* Pastel Candy Colors */
+    .tile:nth-child(5n+1) { background: #ffb3ba; } /* Pink */
+    .tile:nth-child(5n+2) { background: #bae1ff; } /* Blue */
+    .tile:nth-child(5n+3) { background: #baffc9; } /* Green */
+    .tile:nth-child(5n+4) { background: #ffdfba; } /* Orange */
+    .tile:nth-child(5n+5) { background: #ffffba; } /* Yellow */
+
+    .start-tile {
+      background: #ffd700;
+      font-size: 24px;
+      color: #333;
+    }
+
+    /* =======================
+       Player
+       ======================= */
+    #player {
+      font-size: 60px; /* bigger icon */
+      position: absolute;
+      transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+      z-index: 10;
+    }
+
+    /* =======================
+       Controls
+       ======================= */
+    .controls button {
+      background: #ff80ab;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      margin: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s;
+    }
+    .controls button:hover {
+      background: #ff4081;
+    }
+    #hints-left {
+      font-size: 20px;
+      color: #ff4081;
+      margin: 10px 0;
+      text-shadow: 1px 1px #fff;
+    }
+
+    /* =======================
+       Popup
+       ======================= */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 235, 205, 0.95);
+      border-radius: 20px;
+      padding: 25px;
+      width: 500px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
+    .popup-content {
+      background: #fff;
+      border: 5px solid #ff80ab;
+      padding: 20px;
+      border-radius: 15px;
+    }
+    .popup h2 {
+      color: #ff4081;
+      font-size: 30px;
+      margin-bottom: 15px;
+    }
+    .popup input {
+      width: 90%;
+      padding: 10px;
+      margin: 15px 0;
+      border: 2px solid #ff80ab;
+      border-radius: 5px;
+      font-size: 18px;
+    }
+    .popup-buttons button {
+      background: #bae1ff;
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    .popup-buttons button:hover {
+      background: #36a2eb;
+    }
+  </style>
 </head>
 <body>
+  <h1>SQL Candy Quest 🍭</h1>
+  <h2>Answer SQL challenges correctly to reach the Candy Castle! 🏰</h2>
 
-    <h1>SQL Candy Quest 🍭</h1>
-    <p>Answer SQL challenges correctly to reach the Candy Castle! 🏰</p>
+  <!-- Character Selection -->
+  <div class="character-select">
+    <h3>Choose Your Character:</h3>
+    <button onclick="selectCharacter('🍭')">Lollipop</button>
+    <button onclick="selectCharacter('🍬')">Candy</button>
+    <button onclick="selectCharacter('🍫')">Chocolate</button>
+  </div>
 
-    <!-- Character Selection -->
-    <div class="character-selection">
-        <p>Choose Your Character:</p>
-        <button onclick="selectCharacter('🍭')">🍭</button>
-        <button onclick="selectCharacter('🍫')">🍫</button>
-        <button onclick="selectCharacter('🍪')">🍪</button>
-    </div>
+  <!-- Game Board -->
+  <div class="board">
+    <div id="tiles-container" class="tiles"></div>
+    <div id="player">🍭</div>
+  </div>
 
-    <!-- Board Game -->
-    <div class="board">
-        <div class="tiles" id="tiles-container"></div>
-        <div id="player">❓</div>
-    </div>
+  <!-- Controls -->
+  <div class="controls">
+    <button onclick="getQuestion('easy')">Easy Path</button>
+    <button onclick="getQuestion('medium')">Medium Path</button>
+    <button onclick="getQuestion('advanced')">Advanced Path</button>
+    <button onclick="resetPlayer()">Reset</button>
+  </div>
 
-    <!-- Question Box -->
-    <div class="question-box">
-        <p id="question">Click a difficulty to get a question!</p>
-        <input type="text" id="answer" placeholder="Type your SQL query here...">
+  <div id="hints-left">Hints Left: 3</div>
+
+  <!-- Popup for Questions -->
+  <div id="question-popup" class="popup">
+    <div class="popup-content">
+      <h2>Sweet Challenge 🍬</h2>
+      <p id="question-text"></p>
+      <input type="text" id="answer" placeholder="Type your SQL query here...">
+      <div class="popup-buttons">
         <button onclick="submitAnswer()">Submit</button>
-        <button onclick="getHint()">💡 Hint (<span id="hints">3</span> left)</button>
-        <button onclick="showSchema()">📜 Show Database Schema</button>
+        <button onclick="showHint()">Hint</button>
+        <button onclick="showDatabaseSchema()">Show Database Schema</button>
+        <button onclick="showAnswer()">Show Answer</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Difficulty Selection -->
-    <div class="buttons">
-        <button onclick="getQuestion('easy')">Easy (1 space)</button>
-        <button onclick="getQuestion('medium')">Medium (2 spaces)</button>
-        <button onclick="getQuestion('advanced')">Advanced (3 spaces)</button>
-    </div>
+  <script>
+    /* ========================================
+       GLOBAL VARIABLES & INITIAL SETUP
+    ======================================= */
+    let playerPosition = 0;
+    const totalSpaces = 17;
+    let hintsLeft = 3;
+    let playerIcon = "🍭"; // Default
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    /* Adjust for bigger board */
+    const tileSize = 100;
+    const tileSpacing = 120;
 
+    const tilePositions = [];
+
+    /* Generate tile positions in a 5-column layout */
+    for (let i = 0; i < totalSpaces; i++) {
+      let x = 100 + (i % 5) * tileSpacing;
+      let y = 100 + Math.floor(i / 5) * tileSpacing;
+      tilePositions.push([x, y]);
+    }
+
+    function generateTiles() {
+      const tilesContainer = document.getElementById("tiles-container");
+      tilesContainer.innerHTML = "";
+
+      // Create "Start" tile
+      const startTile = document.createElement("div");
+      startTile.classList.add("tile", "start-tile");
+      startTile.innerText = "Start";
+      startTile.style.left = `${tilePositions[0][0]}px`;
+      startTile.style.top = `${tilePositions[0][1]}px`;
+      tilesContainer.appendChild(startTile);
+
+      // Create numbered tiles, last is the castle
+      for (let i = 1; i < totalSpaces; i++) {
+        const tile = document.createElement("div");
+        tile.classList.add("tile");
+        tile.innerText = i === totalSpaces - 1 ? "🏰" : i;
+        tile.style.left = `${tilePositions[i][0]}px`;
+        tile.style.top = `${tilePositions[i][1]}px`;
+        tilesContainer.appendChild(tile);
+      }
+
+      // Place player on the start tile
+      resetPlayer();
+    }
+
+    function movePlayer(spaces) {
+      playerPosition = Math.min(playerPosition + spaces, totalSpaces - 1);
+      const [x, y] = tilePositions[playerPosition];
+      const player = document.getElementById("player");
+      player.style.left = `${x}px`;
+      player.style.top = `${y}px`;
+
+      // Reached the Candy Castle?
+      if (playerPosition === totalSpaces - 1) {
+        alert("🎉 Congratulations! You've reached the Candy Castle!");
+        resetPlayer();
+      }
+    }
+
+    function resetPlayer() {
+      playerPosition = 0;
+      hintsLeft = 3;
+      document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
+
+      const [x, y] = tilePositions[playerPosition];
+      const player = document.getElementById("player");
+      player.style.left = `${x}px`;
+      player.style.top = `${y}px`;
+    }
+
+    function selectCharacter(icon) {
+      playerIcon = icon;
+      document.getElementById("player").innerText = icon;
+      resetPlayer();
+    }
+
+    /* ========================================
+       SQL CHALLENGES
+    ======================================= */
+    let currentQuestion = null;
+    const sqlQuestions = {
+      easy: [
+        {
+          question: "Find all candy shops in 'Candyland'.",
+          answer: "SELECT * FROM candy_shops WHERE location = 'Candyland';"
+        },
+        {
+          question: "Get all candy ingredients that are 'Rare'.",
+          answer: "SELECT * FROM candy_ingredients WHERE rarity = 'Rare';"
+        }
+      ],
+      medium: [
+        {
+          question: "List all unique candy ingredient rarities.",
+          answer: "SELECT DISTINCT rarity FROM candy_ingredients;"
+        },
+        {
+          question: "Find the highest-rated candy shops.",
+          answer: "SELECT * FROM candy_shops WHERE rating = 5;"
+        }
+      ],
+      advanced: [
+        {
+          question: "Retrieve candy ingredients and their shop names.",
+          answer: "SELECT candy_ingredients.name, candy_shops.name FROM candy_ingredients JOIN candy_shops ON candy_ingredients.shop_id = candy_shops.id;"
+        },
+        {
+          question: "Find the number of ingredients available at each shop.",
+          answer: "SELECT COUNT(*) FROM candy_ingredients GROUP BY shop_id;"
+        }
+      ]
+    };
+
+    function getQuestion(difficulty) {
+      const questionList = sqlQuestions[difficulty];
+      currentQuestion = questionList[Math.floor(Math.random() * questionList.length)];
+
+      document.getElementById("question-text").innerText = currentQuestion.question;
+      document.getElementById("answer").value = "";
+      document.getElementById("question-popup").style.display = "block";
+    }
+
+    function submitAnswer() {
+      const userAnswer = document.getElementById("answer").value.trim();
+      if (userAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
+        alert("🎉 Correct! Moving forward.");
+        movePlayer(1);
+        document.getElementById("question-popup").style.display = "none";
+        currentQuestion = null;
+      } else {
+        alert("❌ Incorrect! Try again.");
+      }
+    }
+
+    function showHint() {
+      if (hintsLeft > 0 && currentQuestion) {
+        const keyCondition = currentQuestion.question.split("'")[1] || "the key condition";
+        alert(`Hint: Think about filtering with WHERE on '${keyCondition}'.`);
+        hintsLeft--;
+        document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
+      } else {
+        alert("No hints left!");
+      }
+    }
+
+    function showDatabaseSchema() {
+      alert(
+        "Tables:\n" +
+        "1. candy_shops - id, name, location, rating\n" +
+        "2. candy_ingredients - id, name, rarity, shop_id"
+      );
+    }
+
+    function showAnswer() {
+      if (currentQuestion) {
+        alert(
+          `Answer: ${currentQuestion.answer}\n\n` +
+          "Explanation: This query retrieves the requested data using SQL filtering and joins as needed."
+        );
+      }
+    }
+
+    window.onload = () => {
+      generateTiles();
+    };
+  </script>
 </body>
 </html>

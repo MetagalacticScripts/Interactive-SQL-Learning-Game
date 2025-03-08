@@ -1,65 +1,200 @@
+/* =======================
+   Global Styles
+   ======================= */
 body {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    text-align: center;
-    background: url('/static/images/background.png') no-repeat center center fixed;
-    background-size: cover;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: radial-gradient(circle, #ffe6f2, #ffeef8, #fff);
+  color: #333;
 }
 
+/* Title & Headings */
 h1 {
-    color: #ff4081;
-    font-size: 36px;
-    text-shadow: 2px 2px #fff;
+  font-size: 50px;
+  color: #ff4081;
+  text-shadow: 2px 2px #fff;
+  margin: 10px 0;
 }
 
-/* Candy Land Board */
+h2 {
+  font-size: 28px;
+  color: #ff4081;
+  text-shadow: 1px 1px #fff;
+  margin-bottom: 20px;
+}
+
+h3 {
+  color: #ff4081;
+  font-size: 22px;
+  margin: 10px 0;
+}
+
+/* =======================
+   Character Select
+   ======================= */
+.character-select button {
+  background: #ff80ab;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  margin: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s;
+}
+
+.character-select button:hover {
+  background: #ff4081;
+}
+
+/* =======================
+   Game Board
+   ======================= */
 .board {
-    width: 700px;
-    height: 500px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    margin: 20px auto;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    position: relative;
+  width: 900px;
+  height: 700px;
+  background: rgba(255, 255, 255, 0.9);
+  margin: 30px auto;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+  border: 6px dashed #ff80ab;
 }
 
-/* Tile path shaped like Candy Land */
+/* =======================
+   Tiles
+   ======================= */
 .tiles {
-    display: flex;
-    flex-wrap: wrap;
-    width: 700px;
-    height: 500px;
-    position: relative;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
-/* Candy Land tile colors */
+/* Increase tile size and spacing for bigger UI */
 .tile {
-    width: 60px;
-    height: 60px;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  color: #fff;
+  position: absolute;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s;
 }
 
-/* Custom Candy Land colors */
-.tile:nth-child(5n+1) { background: #ff6384; } /* Red */
-.tile:nth-child(5n+2) { background: #ffcd56; } /* Yellow */
-.tile:nth-child(5n+3) { background: #36a2eb; } /* Blue */
-.tile:nth-child(5n+4) { background: #4bc0c0; } /* Green */
-.tile:nth-child(5n+5) { background: #ff9f40; } /* Orange */
+.tile:hover {
+  transform: scale(1.05);
+}
 
-/* Player icon */
+/* Candy Colors (pastel style) */
+.tile:nth-child(5n+1) { background: #ffb3ba; } /* Pink */
+.tile:nth-child(5n+2) { background: #bae1ff; } /* Blue */
+.tile:nth-child(5n+3) { background: #baffc9; } /* Green */
+.tile:nth-child(5n+4) { background: #ffdfba; } /* Orange */
+.tile:nth-child(5n+5) { background: #ffffba; } /* Yellow */
+
+/* Start tile styling */
+.start-tile {
+  background: #ffd700;
+  font-size: 24px;
+  color: #333;
+}
+
+/* =======================
+   Player
+   ======================= */
 #player {
-    font-size: 30px;
-    position: absolute;
-    transition: transform 0.5s ease-in-out;
+  font-size: 60px; /* Bigger player icon */
+  position: absolute;
+  transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+  z-index: 10;
+}
+
+/* =======================
+   Controls
+   ======================= */
+.controls button {
+  background: #ff80ab;
+  color: white;
+  border: none;
+  padding: 14px 30px;
+  margin: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s;
+}
+
+.controls button:hover {
+  background: #ff4081;
+}
+
+#hints-left {
+  font-size: 20px;
+  color: #ff4081;
+  margin: 10px 0;
+  text-shadow: 1px 1px #fff;
+}
+
+/* =======================
+   Popup
+   ======================= */
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 235, 205, 0.95);
+  border-radius: 20px;
+  padding: 25px;
+  width: 500px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  border: 5px solid #ff80ab;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.popup h2 {
+  color: #ff4081;
+  font-size: 30px;
+  margin-bottom: 15px;
+}
+
+.popup input {
+  width: 90%;
+  padding: 10px;
+  margin: 15px 0;
+  border: 2px solid #ff80ab;
+  border-radius: 5px;
+  font-size: 18px;
+}
+
+.popup-buttons button {
+  background: #bae1ff;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.popup-buttons button:hover {
+  background: #36a2eb;
 }
