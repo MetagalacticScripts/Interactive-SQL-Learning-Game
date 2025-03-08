@@ -103,7 +103,7 @@
     }
     .board {
       width: clamp(80vw, 90vw, 70vw);
-      height: clamp(40vh, 50vh, 80vh); /* Increased to fit all 20 tiles */
+      height: clamp(40vh, 50vh, 80vh);
       background: #FFFFFF;
       margin: 1vh 0;
       border-radius: 1vh;
@@ -297,15 +297,13 @@
       }
       .board {
         width: 70vw;
-        height: 80vh; /* Adjusted to fit all 20 tiles in a 5x4 grid */
+        height: 80vh; /* Adjusted to fit dynamically */
       }
       .progress-bar {
         width: 70vw;
       }
       .tiles {
-        grid-template-columns: repeat(5, 1fr); /* Explicit 5 columns */
-        grid-template-rows: repeat(4, 1fr);    /* Explicit 4 rows for 20 tiles */
-        gap: 1vh;
+        /* Dynamic grid will be set via JavaScript */
       }
       .tile {
         font-size: clamp(2rem, 5vw, 3rem);
@@ -559,7 +557,6 @@
         if (groupByMatch) {
           const groupByCols = groupByMatch[1].split(',').map(col => col.trim().split('.')[1]);
           const havingMatch = query.match(/HAVING\s+(.+)/i);
-          const aggregates = {};
           const grouped = {};
           result.forEach(row => {
             const key = groupByCols.map(col => row[col]).join('|');
@@ -673,7 +670,65 @@
       }
     }
 
+    function adjustGridLayout() {
+      const tilesContainer = document.getElementById("tiles-container");
+      const board = document.querySelector('.board');
+      const boardHeight = board.clientHeight;
+      const boardWidth = board.clientWidth;
+      const isDesktop = window.innerWidth >= 768;
+      const totalTiles = totalSpaces; // 20 tiles
+
+      if (isDesktop) {
+        // Default: Aim for a 5x4 grid (5 columns, 4 rows)
+        let columns = 5;
+        let rows = Math.ceil(totalTiles / columns); // 4 rows for 20 tiles
+
+        // Estimate tile size (accounting for padding and gaps)
+        const gap = 0.5 * 16; // 0.5vh gap converted to pixels (assuming 16px = 1vh)
+        const padding = 1 * 16; // 1vh padding on each side
+        const availableWidth = boardWidth - 2 * padding;
+        const availableHeight = boardHeight - 2 * padding;
+        let tileWidth = (availableWidth - (columns - 1) * gap) / columns;
+        let tileHeight = (availableHeight - (rows - 1) * gap) / rows;
+
+        // Ensure tiles are square (aspect-ratio: 1 / 1)
+        const tileSize = Math.min(tileWidth, tileHeight);
+
+        // Check if the grid fits within the board height
+        const totalGridHeight = rows * tileSize + (rows - 1) * gap + 2 * padding;
+        const totalGridWidth = columns * tileSize + (columns - 1) * gap + 2 * padding;
+
+        // If the grid is too tall, adjust the number of columns
+        if (totalGridHeight > boardHeight || totalGridWidth > boardWidth) {
+          // Try different column counts until the grid fits
+          for (columns = 4; columns >= 2; columns--) {
+            rows = Math.ceil(totalTiles / columns);
+            tileWidth = (availableWidth - (columns - 1) * gap) / columns;
+            tileHeight = (availableHeight - (rows - 1) * gap) / rows;
+            const tileSize = Math.min(tileWidth, tileHeight);
+            const newGridHeight = rows * tileSize + (rows - 1) * gap + 2 * padding;
+            const newGridWidth = columns * tileSize + (columns - 1) * gap + 2 * padding;
+            if (newGridHeight <= boardHeight && newGridWidth <= boardWidth) {
+              break;
+            }
+          }
+        }
+
+        // Apply the grid layout
+        tilesContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+        tilesContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+      } else {
+        // On mobile, revert to the original auto-fit behavior
+        tilesContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(50px, 1fr))';
+        tilesContainer.style.gridTemplateRows = 'auto';
+      }
+
+      // Regenerate tiles and positions after layout adjustment
+      generateTiles();
+    }
+
     window.onload = () => {
+      adjustGridLayout();
       generateTilePositions();
       generateTiles();
       startTime = Date.now();
@@ -682,8 +737,8 @@
       setupSyntaxHighlighting();
       updateProgress();
       window.addEventListener('resize', () => {
+        adjustGridLayout();
         generateTilePositions();
-        generateTiles();
         placePlayer();
       });
       document.getElementById('tiles-container').addEventListener('touchstart', handleTouchStart);
