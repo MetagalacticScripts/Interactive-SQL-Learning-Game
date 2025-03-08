@@ -10,17 +10,17 @@
     html, body {
       margin: 0;
       padding: 0;
-      height: 100vh;
+      height: 100%;
       background: linear-gradient(to bottom, #E6F0FA, #EAF7F0);
       font-family: 'Roboto', sans-serif;
       color: #333;
-      overflow: hidden;
-      direction: ltr;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
     .container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      min-height: 100vh;
       box-sizing: border-box;
     }
     .sidebar {
@@ -31,6 +31,7 @@
       box-sizing: border-box;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
       overflow-y: auto;
+      max-height: 40vh;
     }
     .main-content {
       flex: 1;
@@ -39,6 +40,7 @@
       align-items: center;
       padding: 2vh;
       box-sizing: border-box;
+      overflow-y: auto;
     }
     h2, h3 {
       margin: 1vh 0;
@@ -123,7 +125,7 @@
     }
     .tiles {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
       gap: 0.5vh;
       width: 100%;
       height: 100%;
@@ -217,9 +219,10 @@
       font-family: 'Courier New', monospace;
       background: #FFFFFF;
       outline: none;
-      overflow: auto;
+      overflow-y: auto; /* Ensure vertical scrolling */
       user-select: text;
       direction: ltr;
+      white-space: pre-wrap; /* Preserve line breaks */
     }
     #answer[contenteditable]:empty:before {
       content: attr(placeholder);
@@ -294,6 +297,7 @@
         border-bottom: none;
         border-right: 1px solid #E0E0E0;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+        max-height: none;
       }
       .board {
         width: 70vw;
@@ -304,6 +308,9 @@
       }
       .tiles {
         grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      }
+      .controls {
+        flex-wrap: nowrap;
       }
     }
   </style>
@@ -866,124 +873,106 @@
         "shop_name VARCHAR(100) NOT NULL\n" +
         "location VARCHAR(100)\n" +
         "rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)\n\n" +
-        "\u001b[32m=== products ===\u001b[0m\n" +
+        "\u001b[34m=== products ===\u001b[0m\n" +
         "product_id INT PRIMARY KEY\n" +
         "product_name VARCHAR(100) NOT NULL\n" +
         "category VARCHAR(50)\n" +
-        "price DECIMAL(6,2)\n" +
+        "price DECIMAL(10,2)\n" +
         "stock_quantity INT\n\n" +
-        "\u001b[31m=== sales ===\u001b[0m\n" +
+        "\u001b[34m=== sales ===\u001b[0m\n" +
         "sale_id INT PRIMARY KEY\n" +
-        "shop_id INT (FK to candy_shops)\n" +
-        "product_id INT (FK to products)\n" +
+        "shop_id INT\n" +
+        "product_id INT\n" +
         "sale_date DATE\n" +
         "quantity_sold INT\n" +
-        "total_amount DECIMAL(10,2)"
+        "total_amount DECIMAL(10,2)\n" +
+        "FOREIGN KEY (shop_id) REFERENCES candy_shops(shop_id)\n" +
+        "FOREIGN KEY (product_id) REFERENCES products(product_id)"
       );
     }
 
     function showAnswer() {
-      if (!currentQuestion) return;
-      showMessage(
-        `Correct Answer: ${currentQuestion.answer}\n\n` +
-        "Explanation: This query retrieves the requested data by applying the necessary SQL clauses and conditions to filter and present the results accurately."
-      );
-      closePopup();
-      currentQuestion = null;
-      if (playerPosition > 0) {
-        playerPosition = Math.max(playerPosition - 1, 0);
-        placePlayer();
+      if (!currentQuestion) {
+        showMessage("There is no active question to show the answer for.");
+        return;
       }
-    }
-
-    function setupSyntaxHighlighting() {
-      const answerDiv = document.getElementById("answer");
-      answerDiv.addEventListener("input", highlightSyntax);
-      answerDiv.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          document.execCommand("insertHTML", false, "<br>");
-        }
-      });
-    }
-
-    function highlightSyntax() {
-      const answerDiv = document.getElementById("answer");
-      const selection = window.getSelection();
-      const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-      let text = answerDiv.innerText || "";
-      let cursorOffset = range ? range.startOffset : text.length;
-
-      // Apply syntax highlighting
-      const keywords = /\b(SELECT|FROM|WHERE|JOIN|ON|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|IN|LIKE|BETWEEN|DISTINCT|SUM|AVG|COUNT|MAX|MIN|DATE_SUB|CURDATE|MONTH|YEAR)\b/gi;
-      const strings = /('[^']*')/g;
-      const numbers = /\b(\d+\.?\d*)\b/g;
-
-      text = text
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(keywords, '<span class="sql-keyword">$1</span>')
-        .replace(strings, '<span class="sql-string">$1</span>')
-        .replace(numbers, '<span class="sql-number">$1</span>')
-        .replace(/\n/g, "<br>");
-
-      // Set the highlighted HTML
-      answerDiv.innerHTML = text;
-
-      // Restore cursor position
-      if (range) {
-        try {
-          const newRange = document.createRange();
-          let node = answerDiv;
-          let offset = cursorOffset;
-          let childNodes = Array.from(answerDiv.childNodes);
-          let charCount = 0;
-
-          for (let i = 0; i < childNodes.length; i++) {
-            const child = childNodes[i];
-            if (child.nodeType === Node.TEXT_NODE) {
-              charCount += child.textContent.length;
-              if (charCount >= offset) {
-                newRange.setStart(child, offset - (charCount - child.textContent.length));
-                break;
-              }
-            } else if (child.nodeType === Node.ELEMENT_NODE) {
-              charCount += child.textContent.length;
-              if (charCount >= offset) {
-                newRange.setStart(child.firstChild || child, offset - (charCount - child.textContent.length));
-                break;
-              }
-            }
-          }
-          newRange.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(newRange);
-        } catch (e) {
-          console.error("Failed to restore cursor position:", e);
-        }
-      }
-
-      // Ensure text direction is LTR
-      answerDiv.style.direction = "ltr";
+      showMessage(`The correct answer is:\n${currentQuestion.answer}`);
     }
 
     function closePopup() {
       document.getElementById("question-popup").style.display = "none";
-    }
-
-    function showMessage(msg) {
-      const formattedMsg = msg
-        .replace(/\u001b\[34m/g, '<span style="color: blue; font-weight: bold;">')
-        .replace(/\u001b\[32m/g, '<span style="color: green; font-weight: bold;">')
-        .replace(/\u001b\[31m/g, '<span style="color: red; font-weight: bold;">')
-        .replace(/\u001b\[0m/g, '</span>');
-      document.getElementById("message-text").innerHTML = formattedMsg;
-      document.getElementById("message-popup").style.display = "block";
+      const answerDiv = document.getElementById("answer");
+      answerDiv.innerHTML = "";
     }
 
     function closeMessagePopup() {
       document.getElementById("message-popup").style.display = "none";
+      const messageText = document.getElementById("message-text");
+      messageText.innerText = "";
+    }
+
+    function showMessage(message) {
+      const messageText = document.getElementById("message-text");
+      messageText.innerText = message;
+      document.getElementById("message-popup").style.display = "block";
+    }
+
+    function setupSyntaxHighlighting() {
+      const answerDiv = document.getElementById("answer");
+      let selection = null;
+
+      answerDiv.addEventListener("input", () => {
+        // Save the current selection
+        selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(answerDiv);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        const caretOffset = preCaretRange.toString().length;
+
+        // Apply syntax highlighting
+        let text = answerDiv.innerText;
+        text = text.replace(/\b(SELECT|FROM|WHERE|JOIN|GROUP BY|HAVING|ORDER BY|LIMIT)\b/gi, '<span class="sql-keyword">$&</span>');
+        text = text.replace(/'[^']*'/g, '<span class="sql-string">$&</span>');
+        text = text.replace(/\b\d+(\.\d+)?\b/g, '<span class="sql-number">$&</span>');
+        answerDiv.innerHTML = text;
+
+        // Restore the cursor position
+        const newRange = document.createRange();
+        const newSelection = window.getSelection();
+        let currentOffset = 0;
+        let foundNode = null;
+        function traverse(node) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            currentOffset += node.length;
+            if (currentOffset >= caretOffset && !foundNode) {
+              foundNode = node;
+            }
+          } else {
+            for (let child of node.childNodes) {
+              traverse(child);
+            }
+          }
+        }
+        traverse(answerDiv);
+        if (foundNode) {
+          const offsetInNode = caretOffset - (currentOffset - foundNode.length);
+          newRange.setStart(foundNode, offsetInNode);
+          newRange.setEnd(foundNode, offsetInNode);
+          newSelection.removeAllRanges();
+          newSelection.addRange(newRange);
+        }
+
+        // Ensure the cursor is visible
+        answerDiv.scrollTop = answerDiv.scrollHeight;
+      });
+
+      // Prevent default behavior that might interfere with cursor
+      answerDiv.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault(); // Prevent new line for now, or handle it manually if needed
+        }
+      });
     }
   </script>
 </body>
