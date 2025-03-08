@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SQL Candy Quest 🍭</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
@@ -9,25 +10,26 @@
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
+      height: 100vh;
       background: linear-gradient(to bottom, #E6F0FA, #EAF7F0);
       font-family: 'Roboto', sans-serif;
       color: #333;
       overflow: hidden;
-      direction: ltr; /* Force left-to-right text direction */
+      direction: ltr;
     }
     .container {
       display: flex;
+      flex-direction: column;
       height: 100vh;
       box-sizing: border-box;
     }
     .sidebar {
-      width: 300px;
+      width: 100%;
       background: #FFFFFF;
-      border-right: 1px solid #E0E0E0;
-      padding: 25px;
+      border-bottom: 1px solid #E0E0E0;
+      padding: 2vh;
       box-sizing: border-box;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
       overflow-y: auto;
     }
     .main-content {
@@ -35,27 +37,27 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 25px;
+      padding: 2vh;
       box-sizing: border-box;
     }
     h2, h3 {
-      margin: 12px 0;
+      margin: 1vh 0;
       color: #4A90E2;
       font-weight: 500;
-      font-size: 28px;
+      font-size: 5vw;
     }
     .time-display {
-      font-size: 22px;
-      margin: 12px 0;
+      font-size: 4vw;
+      margin: 1vh 0;
       color: #4A90E2;
     }
     #scoreboard {
-      margin-top: 25px;
+      margin-top: 2vh;
       border: 1px solid #E0E0E0;
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 1vh;
+      padding: 1vh;
       background: #FAFAFA;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 0.2vh 1vh rgba(0, 0, 0, 0.05);
     }
     #score-list {
       list-style: none;
@@ -63,105 +65,107 @@
       padding: 0;
     }
     #score-list li {
-      padding: 6px 0;
+      padding: 0.5vh 0;
       border-bottom: 1px solid #E0E0E0;
-      font-size: 18px;
+      font-size: 3vw;
     }
     h1 {
-      font-size: 60px;
+      font-size: 8vw;
       color: #4A90E2;
-      margin: 35px 0;
-      padding: 25px;
+      margin: 2vh 0;
+      padding: 1vh;
       font-weight: 500;
     }
     .character-select button, .controls button {
       background: #4A90E2;
       color: #FFFFFF;
       border: none;
-      padding: 12px 30px;
-      margin: 6px;
-      border-radius: 6px;
+      padding: 1vh 3vw;
+      margin: 0.5vh;
+      border-radius: 0.5vh;
       cursor: pointer;
-      font-size: 22px;
+      font-size: 3.5vw;
       transition: background 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
     }
     .character-select button:hover, .controls button:hover {
       background: #357ABD;
       transform: scale(1.1);
     }
     #hints-left {
-      font-size: 22px;
+      font-size: 3.5vw;
       color: #4A90E2;
-      margin: 6px 0;
+      margin: 0.5vh 0;
     }
     .board {
-      width: 98%;
-      max-width: 1600px;
-      height: 500px;
+      width: 90vw;
+      height: 50vh;
       background: #FFFFFF;
-      margin: 12px 0;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      margin: 1vh 0;
+      border-radius: 1vh;
+      box-shadow: 0 0.4vh 2vh rgba(0, 0, 0, 0.1);
       position: relative;
       border: 1px solid #E0E0E0;
       overflow: hidden;
     }
     .progress-bar {
-      width: 98%;
-      max-width: 1600px;
-      height: 12px;
+      width: 90vw;
+      height: 1.5vh;
       background: #E0E0E0;
-      border-radius: 6px;
-      margin: 6px 0;
+      border-radius: 0.5vh;
+      margin: 0.5vh 0;
     }
     #progress {
       height: 100%;
       background: linear-gradient(to right, #B3E5FC, #B2DFDB, #B2F0B2);
-      border-radius: 6px;
+      border-radius: 0.5vh;
       transition: width 0.5s ease;
     }
     .tiles {
-      position: relative;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(8vw, 1fr));
+      gap: 0.5vh;
       width: 100%;
       height: 100%;
+      padding: 1vh;
+      box-sizing: border-box;
     }
     .tile {
-      position: absolute;
-      border-radius: 6px;
+      border-radius: 0.5vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
+      font-size: 5vw;
       font-weight: bold;
       color: #333;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
       transition: transform 0.2s ease;
       background: #F0F4FF;
+      aspect-ratio: 1 / 1;
     }
     .tile:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 3px 6px rgba(240, 244, 255, 0.3);
+      transform: translateY(-0.3vh);
+      box-shadow: 0 0.6vh 1.2vh rgba(240, 244, 255, 0.3);
     }
     .start-tile {
       background: #FFD700;
       color: #333;
-      font-size: 30px;
+      font-size: 4vw;
       border: 1px solid rgba(255, 215, 0, 0.5);
     }
     .sticky-tile {
       background: #FFA500;
-      font-size: 42px;
+      font-size: 6vw;
       border: 1px solid rgba(255, 165, 0, 0.5);
     }
     .castle-icon {
-      font-size: 50px;
+      font-size: 7vw;
     }
     .active-tile {
-      box-shadow: 0 0 12px #4A90E2, 0 0 24px #357ABD;
+      box-shadow: 0 0 1.5vh #4A90E2, 0 0 3vh #357ABD;
     }
     #player {
-      font-size: 72px;
+      font-size: 8vw;
       position: absolute;
       transition: left 0.5s ease-in-out, top 0.5s ease-in-out, transform 0.5s ease-out;
       z-index: 10;
@@ -177,10 +181,11 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: #FFFFFF;
-      border-radius: 10px;
-      padding: 25px;
-      width: 600px;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+      border-radius: 1vh;
+      padding: 2vh;
+      width: 80vw;
+      max-width: 600px;
+      box-shadow: 0 1vh 4vh rgba(0, 0, 0, 0.2);
       z-index: 1000;
       animation: popIn 0.3s ease-out;
     }
@@ -191,30 +196,30 @@
     .popup-content {
       background: #FAFAFA;
       border: 1px solid #E0E0E0;
-      padding: 18px;
-      border-radius: 6px;
+      padding: 1.5vh;
+      border-radius: 0.5vh;
       position: relative;
     }
     .popup h2 {
       color: #4A90E2;
-      font-size: 28px;
-      margin-bottom: 12px;
+      font-size: 5vw;
+      margin-bottom: 1vh;
       font-weight: 500;
     }
     #answer {
       width: 90%;
-      min-height: 120px;
-      padding: 12px;
-      margin: 12px 0;
+      min-height: 15vh;
+      padding: 1vh;
+      margin: 1vh 0;
       border: 1px solid #E0E0E0;
-      border-radius: 6px;
-      font-size: 18px;
+      border-radius: 0.5vh;
+      font-size: 3vw;
       font-family: 'Courier New', monospace;
       background: #FFFFFF;
       outline: none;
       overflow: auto;
-      user-select: text; /* Allow text selection */
-      direction: ltr; /* Force left-to-right text direction */
+      user-select: text;
+      direction: ltr;
     }
     #answer[contenteditable]:empty:before {
       content: attr(placeholder);
@@ -224,11 +229,11 @@
       background: #4A90E2;
       color: #FFFFFF;
       border: none;
-      padding: 10px 20px;
-      margin: 6px;
-      border-radius: 6px;
+      padding: 1vh 2vw;
+      margin: 0.5vh;
+      border-radius: 0.5vh;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 3vw;
       transition: background 0.3s;
     }
     .popup-buttons button:hover {
@@ -236,11 +241,11 @@
     }
     .close-button {
       position: absolute;
-      top: 12px;
-      right: 18px;
+      top: 1vh;
+      right: 1.5vh;
       background: transparent;
       border: none;
-      font-size: 24px;
+      font-size: 4vw;
       cursor: pointer;
       color: #888;
       transition: color 0.3s;
@@ -250,25 +255,25 @@
     }
     #message-popup .popup-content p {
       margin: 0;
-      padding: 12px 0;
+      padding: 1vh 0;
       color: #555;
       white-space: pre-wrap;
-      font-size: 18px;
+      font-size: 3vw;
     }
     #final-popup .popup-content {
       text-align: center;
     }
     #final-popup .confetti {
-      font-size: 36px;
-      margin-bottom: 12px;
+      font-size: 6vw;
+      margin-bottom: 1vh;
     }
     #final-popup input {
       width: 80%;
-      padding: 10px;
-      margin: 12px 0;
+      padding: 1vh;
+      margin: 1vh 0;
       border: 1px solid #E0E0E0;
-      border-radius: 6px;
-      font-size: 18px;
+      border-radius: 0.5vh;
+      font-size: 3vw;
     }
     .sql-keyword {
       color: #0000FF;
@@ -279,6 +284,85 @@
     }
     .sql-number {
       color: #FF00FF;
+    }
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row;
+      }
+      .sidebar {
+        width: 25vw;
+        border-bottom: none;
+        border-right: 1px solid #E0E0E0;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      }
+      h2, h3 {
+        font-size: 2rem;
+      }
+      .time-display {
+        font-size: 1.5rem;
+      }
+      #score-list li {
+        font-size: 1.2rem;
+      }
+      h1 {
+        font-size: 3rem;
+      }
+      .character-select button, .controls button {
+        font-size: 1.2rem;
+        padding: 1rem 2rem;
+      }
+      #hints-left {
+        font-size: 1.2rem;
+      }
+      .board {
+        width: 70vw;
+        height: 60vh;
+      }
+      .progress-bar {
+        width: 70vw;
+      }
+      .tiles {
+        grid-template-columns: repeat(10, 1fr);
+      }
+      .tile {
+        font-size: 2rem;
+      }
+      .start-tile {
+        font-size: 1.5rem;
+      }
+      .sticky-tile {
+        font-size: 2.5rem;
+      }
+      .castle-icon {
+        font-size: 3rem;
+      }
+      #player {
+        font-size: 3rem;
+      }
+      .popup {
+        width: 50vw;
+      }
+      .popup h2 {
+        font-size: 1.5rem;
+      }
+      #answer {
+        font-size: 1rem;
+      }
+      .popup-buttons button {
+        font-size: 1rem;
+      }
+      .close-button {
+        font-size: 1.5rem;
+      }
+      #message-popup .popup-content p {
+        font-size: 1rem;
+      }
+      #final-popup .confetti {
+        font-size: 2rem;
+      }
+      #final-popup input {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
@@ -347,14 +431,12 @@
       </div>
     </div>
   </div>
-
   <audio id="sticky-sound" preload="auto">
     <source src="data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIA/+MYxDsAAABmQkVHSU4AAyAAAAAAR0lYQVQAAAAA/+MYxB8AAABQTEFZRQAAV2VsY29tZSB0byB0aGUgU29mdHdhcmUgRW5naW5lZXJpbmcgSW5zdGl0dXRlIQAA/+MYxCYAAADQTUVESVRBVElPTgAATWV0YWRhdGEgZm9yIHRoZSBTb2Z0d2FyZSBFbmdpbmVlcmluZyBJbnN0aXR1dGUAAAD/+MYxAwAAAExBTUUzAA==" type="audio/mpeg">
   </audio>
   <audio id="win-sound" preload="auto">
     <source src="data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIA/+MYxDsAAABmQkVHSU4AAyAAAAAAR0lYQVQAAAAA/+MYxB8AAABQTEFZRQAAV2lubmluZyBzb3VuZCBmb3IgdGhlIFNvZnR3YXJlIEVuZ2luZWVyaW5nIEluc3RpdHV0ZQAA/+MYxCYAAADQTUVESVRBVElPTgAATWV0YWRhdGEgZm9yIHRoZSBTb2Z0d2FyZSBFbmdpbmVlcmluZyBJbnN0aXR1dGUAAAD/+MYxAwAAAExBTUUzAA==" type="audio/mpeg">
   </audio>
-
   <script>
     const totalSpaces = 20;
     let playerPosition = 0;
@@ -366,14 +448,7 @@
     let startTime = null;
     let timeInterval = null;
     const scoreboard = [];
-    const rows = 2, cols = 10;
-    const boardWidth = 1600 * 0.98;
-    const boardHeight = 500;
-    const tileSpacingX = boardWidth / cols;
-    const tileSpacingY = boardHeight / rows;
-    const tileSizeX = tileSpacingX * 0.9;
-    const tileSizeY = tileSpacingY * 0.8;
-    const tilePositions = [];
+    let tilePositions = [];
     const stickyTiles = new Set();
     let stickyAnswersNeeded = 0;
     const pastelColors = [
@@ -549,18 +624,52 @@
       loadScoreboard();
       setupSyntaxHighlighting();
       updateProgress();
+      window.addEventListener('resize', () => {
+        generateTilePositions();
+        generateTiles();
+        placePlayer();
+      });
+      document.getElementById('tiles-container').addEventListener('touchstart', handleTouchStart);
+      document.getElementById('tiles-container').addEventListener('touchmove', handleTouchMove);
+      document.getElementById('tiles-container').addEventListener('touchend', handleTouchEnd);
     };
 
-    function generateTilePositions() {
-      let index = 0;
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          if (index >= totalSpaces) return;
-          const x = c * tileSpacingX + (tileSpacingX - tileSizeX) / 2;
-          const y = r * tileSpacingY + (tileSpacingY - tileSizeY) / 2;
-          tilePositions.push([x, y]);
-          index++;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    function handleTouchStart(e) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+
+    function handleTouchMove(e) {
+      e.preventDefault();
+    }
+
+    function handleTouchEnd(e) {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (deltaX > 0 && playerPosition < totalSpaces - 1) {
+          getQuestion('easy');
         }
+      }
+    }
+
+    function generateTilePositions() {
+      tilePositions = [];
+      const board = document.querySelector('.board');
+      const tilesContainer = document.getElementById('tiles-container');
+      const boardRect = board.getBoundingClientRect();
+      const tileElements = tilesContainer.children;
+      if (tileElements.length === 0) return;
+      for (let i = 0; i < totalSpaces; i++) {
+        const tileRect = tileElements[i].getBoundingClientRect();
+        const x = tileRect.left - boardRect.left + (tileRect.width - tileRect.width * 0.8) / 2;
+        const y = tileRect.top - boardRect.top + (tileRect.height - tileRect.height * 0.8) / 2;
+        tilePositions.push([x, y]);
       }
     }
 
@@ -571,10 +680,6 @@
       for (let i = 0; i < totalSpaces; i++) {
         const tile = document.createElement("div");
         tile.classList.add("tile");
-        tile.style.width = tileSizeX + "px";
-        tile.style.height = tileSizeY + "px";
-        tile.style.left = tilePositions[i][0] + "px";
-        tile.style.top = tilePositions[i][1] + "px";
         tile.style.background = pastelColors[Math.floor(Math.random() * pastelColors.length)];
         if (i === 0) {
           tile.classList.add("start-tile");
@@ -593,7 +698,10 @@
         }
         container.appendChild(tile);
       }
-      resetPlayer();
+      setTimeout(() => {
+        generateTilePositions();
+        placePlayer();
+      }, 0);
     }
 
     function resetPlayer() {
@@ -601,7 +709,7 @@
       hintsLeft = 3;
       moveCount = 0;
       stickyAnswersNeeded = 0;
-      startTime = Date.now(); // Reset the start time
+      startTime = Date.now();
       if (timeInterval) clearInterval(timeInterval);
       timeInterval = setInterval(updateTimer, 1000);
       document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
@@ -618,12 +726,14 @@
       tiles.forEach((tile, index) => {
         tile.classList.toggle("active-tile", index === playerPosition);
       });
-      const [x, y] = tilePositions[playerPosition];
-      player.style.left = x + "px";
-      player.style.top = y + "px";
-      player.classList.remove("move");
-      void player.offsetWidth;
-      player.classList.add("move");
+      if (tilePositions[playerPosition]) {
+        const [x, y] = tilePositions[playerPosition];
+        player.style.left = x + "px";
+        player.style.top = y + "px";
+        player.classList.remove("move");
+        void player.offsetWidth;
+        player.classList.add("move");
+      }
       updateProgress();
     }
 
@@ -643,7 +753,6 @@
       const newPosition = Math.min(playerPosition + spaces, totalSpaces - 1);
       playerPosition = newPosition;
       placePlayer();
-
       if (playerPosition === totalSpaces - 1) {
         document.getElementById("win-sound").play();
         showFinalPopup();
@@ -854,7 +963,6 @@
           document.execCommand("insertHTML", false, "<br>");
         }
       });
-      // Removed paste, copy, and cut event listeners to allow copy-paste
     }
 
     function highlightSyntax() {
@@ -863,16 +971,14 @@
       const keywords = /\b(SELECT|FROM|WHERE|JOIN|ON|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|IN|LIKE|BETWEEN|DISTINCT|SUM|AVG|COUNT|MAX|MIN|DATE_SUB|CURDATE|MONTH|YEAR)\b/gi;
       const strings = /('[^']*')/g;
       const numbers = /\b(\d+\.?\d*)\b/g;
-
       text = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
+        .replace(/&/g, "&")
+        .replace(/</g, "<")
+        .replace(/>/g, ">")
         .replace(keywords, '<span class="sql-keyword">$1</span>')
         .replace(strings, '<span class="sql-string">$1</span>')
         .replace(numbers, '<span class="sql-number">$1</span>')
         .replace(/\n/g, "<br>");
-
       const selection = window.getSelection();
       const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
       answerDiv.innerHTML = text;
