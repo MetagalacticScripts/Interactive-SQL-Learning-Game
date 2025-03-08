@@ -19,17 +19,18 @@
     }
     .container {
       display: flex;
-      flex-direction: column;
+      flex-direction: column; /* Default for mobile: main-content first, then sidebar */
       min-height: 100vh;
       box-sizing: border-box;
     }
     .sidebar {
       width: 100%;
       background: #FFFFFF;
-      border-bottom: 1px solid #E0E0E0;
+      border-top: 1px solid #E0E0E0;
       padding: 2vh;
       box-sizing: border-box;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+      order: 2; /* Ensure sidebar comes after main-content on mobile */
       overflow-y: auto;
       max-height: 40vh;
     }
@@ -40,6 +41,7 @@
       align-items: center;
       padding: 2vh;
       box-sizing: border-box;
+      order: 1; /* Main content first on mobile */
       overflow-y: auto;
     }
     h2, h3 {
@@ -219,10 +221,10 @@
       font-family: 'Courier New', monospace;
       background: #FFFFFF;
       outline: none;
-      overflow-y: auto; /* Ensure vertical scrolling */
+      overflow-y: auto;
       user-select: text;
       direction: ltr;
-      white-space: pre-wrap; /* Preserve line breaks */
+      white-space: pre-wrap;
     }
     #answer[contenteditable]:empty:before {
       content: attr(placeholder);
@@ -278,26 +280,20 @@
       border-radius: 0.5vh;
       font-size: clamp(0.8rem, 3vw, 1rem);
     }
-    .sql-keyword {
-      color: #0000FF;
-      font-weight: bold;
-    }
-    .sql-string {
-      color: #008000;
-    }
-    .sql-number {
-      color: #FF00FF;
-    }
     @media (min-width: 768px) {
       .container {
-        flex-direction: row;
+        flex-direction: row-reverse; /* Desktop: main-content on the left, sidebar on the right */
       }
       .sidebar {
         width: 25vw;
-        border-bottom: none;
-        border-right: 1px solid #E0E0E0;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+        border-top: none;
+        border-left: 1px solid #E0E0E0;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
         max-height: none;
+        order: 0; /* Reset order for desktop */
+      }
+      .main-content {
+        order: 0; /* Reset order for desktop */
       }
       .board {
         width: 70vw;
@@ -307,7 +303,21 @@
         width: 70vw;
       }
       .tiles {
-        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+        grid-template-columns: repeat(5, 1fr); /* Fixed number of columns for better control */
+        grid-template-rows: repeat(4, 1fr); /* 4 rows to fit 20 tiles */
+        gap: 1vh; /* Slightly larger gap for better spacing */
+      }
+      .tile {
+        font-size: clamp(2rem, 5vw, 3rem); /* Larger tiles on desktop */
+      }
+      .start-tile {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+      }
+      .sticky-tile {
+        font-size: clamp(2rem, 6vw, 3rem);
+      }
+      .castle-icon {
+        font-size: clamp(2.5rem, 7vw, 4rem);
       }
       .controls {
         flex-wrap: nowrap;
@@ -317,14 +327,6 @@
 </head>
 <body>
   <div class="container">
-    <div class="sidebar">
-      <h2>SQL Candy Quest 🍭</h2>
-      <div class="time-display" id="time-display">Time Elapsed: 0m 0s</div>
-      <div id="scoreboard">
-        <h3>Scoreboard</h3>
-        <ul id="score-list"></ul>
-      </div>
-    </div>
     <div class="main-content">
       <h1>Reach the Candy Castle!</h1>
       <div class="character-select">
@@ -344,6 +346,14 @@
         <button onclick="resetPlayer()">Reset</button>
       </div>
       <div id="hints-left">Hints Left: 3</div>
+    </div>
+    <div class="sidebar">
+      <h2>SQL Candy Quest 🍭</h2>
+      <div class="time-display" id="time-display">Time Elapsed: 0m 0s</div>
+      <div id="scoreboard">
+        <h3>Scoreboard</h3>
+        <ul id="score-list"></ul>
+      </div>
     </div>
   </div>
   <div id="question-popup" class="popup">
@@ -742,63 +752,164 @@
 
     function updateScoreboard(playerName) {
       const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
-      let achievements = [];
-      if (moveCount < 10) achievements.push("🏆 Candy Master");
-      if (hintsLeft === 3) achievements.push("✨ SQL Wizard");
-      const scoreboardEntry = {
-        name: playerName,
-        moves: moveCount,
-        time: elapsedSec,
-        achievements: achievements
-      };
-      scoreboard.push(scoreboardEntry);
-      saveScoreboard();
+      const score = { name: playerName, time: elapsedSec, moves: moveCount };
+      scoreboard.push(score);
+      scoreboard.sort((a, b) => a.time - b.time);
+      if (scoreboard.length > 10) scoreboard.pop();
       updateScoreboardDisplay();
+      saveScoreboard();
     }
 
     function updateScoreboardDisplay() {
       const list = document.getElementById("score-list");
       list.innerHTML = "";
-      scoreboard.forEach((entry) => {
+      scoreboard.forEach((entry, index) => {
         const li = document.createElement("li");
-        const mins = Math.floor(entry.time / 60);
-        const secs = entry.time % 60;
-        const achievementsText = entry.achievements.length > 0 ? ` - ${entry.achievements.join(", ")}` : "";
-        li.textContent = `${entry.name} - ${entry.moves} moves, ${mins}m ${secs}s${achievementsText}`;
+        li.innerText = `${index + 1}. ${entry.name} - ${Math.floor(entry.time / 60)}m ${entry.time % 60}s (${entry.moves} moves)`;
         list.appendChild(li);
       });
     }
 
-    function showFinalPopup() {
-      document.getElementById("final-message").innerText = `You reached the Candy Castle in ${moveCount} moves!`;
-      document.getElementById("player-name").value = "";
-      document.getElementById("final-popup").style.display = "block";
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
+    function getQuestion(difficulty) {
+      if (stickyAnswersNeeded > 0) {
+        showMessage("You must clear the sticky honey tile by answering questions correctly before moving further.");
+        return;
+      }
+      if (playerPosition >= totalSpaces - 1) {
+        showMessage("You have already reached the Candy Castle!");
+        return;
+      }
+      const pool = sqlQuestions[difficulty];
+      const used = usedQuestions[difficulty];
+      const available = pool.filter((q, idx) => !used.has(idx));
+      if (available.length === 0) {
+        showMessage("No more questions are available for this difficulty level.");
+        return;
+      }
+      const randIndex = Math.floor(Math.random() * available.length);
+      currentQuestion = available[randIndex];
+      const originalIndex = pool.indexOf(currentQuestion);
+      used.add(originalIndex);
+      spacesToMove = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
+      document.getElementById("question-text").innerText = currentQuestion.question;
+      const answerDiv = document.getElementById("answer");
+      answerDiv.innerHTML = ""; // Clear the answer field
+      answerDiv.focus();
+      document.getElementById("question-popup").style.display = "block";
+    }
+
+    function setupSyntaxHighlighting() {
+      const answerDiv = document.getElementById("answer");
+      answerDiv.addEventListener("input", function() {
+        const text = this.innerText;
+        const highlighted = text
+          .replace(/\b(SELECT|FROM|WHERE|JOIN|GROUP|BY|HAVING|ORDER|LIMIT|NOT|IN|AND|OR|AS|SUM|AVG|COUNT|DISTINCT)\b/gi, '<span class="sql-keyword">$1</span>')
+          .replace(/'[^']*'/gi, '<span class="sql-string">$&</span>')
+          .replace(/\b\d+(\.\d+)?\b/gi, '<span class="sql-number">$&</span>');
+        this.innerHTML = highlighted;
+        // Move cursor to end
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(this);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
       });
     }
 
-    function closeFinalPopup() {
-      document.getElementById("final-popup").style.display = "none";
-    }
-
-    function submitFinalScore() {
-      const nameField = document.getElementById("player-name");
-      const playerName = nameField.value.trim() || "Anonymous";
-      updateScoreboard(playerName);
-      closeFinalPopup();
-      resetPlayer();
-      startTime = Date.now();
-    }
-
-    function getQuestion(difficulty) {
-      switch(difficulty) {
-        case "easy": spacesToMove = 1; break;
-        case "medium": spacesToMove = 2; break;
-        case "advanced": spacesToMove = 3; break;
+    function submitAnswer() {
+      if (!currentQuestion) {
+        showMessage("Please select a question first.");
+        return;
       }
+      const answerDiv = document.getElementById("answer");
+      const userAnswer = answerDiv.innerText.trim();
+      const correctAnswer = currentQuestion.answer.trim();
+      if (userAnswer === correctAnswer) {
+        if (stickyAnswersNeeded > 0) {
+          stickyAnswersNeeded--;
+          if (stickyAnswersNeeded > 0) {
+            showMessage(`Correct! One more correct answer is required to pass the sticky honey tile. (${stickyAnswersNeeded} left)`);
+          } else {
+            showMessage("Correct! You have cleared the sticky honey tile. You may proceed on your next turn.");
+          }
+        } else {
+          movePlayer(spacesToMove);
+          showMessage("Correct! You moved forward!");
+        }
+        currentQuestion = null;
+        closePopup();
+      } else {
+        showMessage("Incorrect answer. Try again or use a hint!");
+      }
+    }
+
+    function showHint() {
+      if (hintsLeft <= 0) {
+        showMessage("No hints left!");
+        return;
+      }
+      if (!currentQuestion) {
+        showMessage("There is no active question to show a hint for.");
+        return;
+      }
+      hintsLeft--;
+      const hintText = currentQuestion.answer.split(" ").slice(0, Math.floor(currentQuestion.answer.split(" ").length / 2)).join(" ") + " ...";
+      showMessage(`Hint: ${hintText}\nHints Left: ${hintsLeft}`);
+      document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
+    }
+
+    function showDatabaseSchema() {
+      showMessage(
+        `<pre style="font-size: clamp(0.7rem, 2.5vw, 0.9rem); line-height: 1.5; white-space: pre-wrap; margin: 0;">
+<span style="color: #4A90E2; font-weight: bold;">candy_shops</span>
+shop_id INT PRIMARY KEY
+shop_name VARCHAR(100) NOT NULL
+location VARCHAR(100)
+rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)
+
+<span style="color: #4A90E2; font-weight: bold;">products</span>
+product_id INT PRIMARY KEY
+product_name VARCHAR(100) NOT NULL
+category VARCHAR(50)
+price DECIMAL(10,2)
+stock_quantity INT
+
+<span style="color: #4A90E2; font-weight: bold;">sales</span>
+sale_id INT PRIMARY KEY
+shop_id INT
+product_id INT
+sale_date DATE
+quantity_sold INT
+total_amount DECIMAL(10,2)
+FOREIGN KEY (shop_id) REFERENCES candy_shops(shop_id)
+FOREIGN KEY (product_id) REFERENCES products(product_id)
+        </pre>`
+      );
+    }
+
+    function showAnswer() {
+      if (!currentQuestion) {
+        showMessage("There is no active question to show the answer for.");
+        return;
+      }
+      const difficulty = getCurrentDifficulty();
+      showMessage(`The correct answer is:\n${currentQuestion.answer}`);
+      // Clear the current question to prevent copying
+      currentQuestion = null;
+      // Load a new question of the same difficulty
+      setTimeout(() => {
+        getNewQuestion(difficulty);
+      }, 0);
+    }
+
+    function getCurrentDifficulty() {
+      if (spacesToMove === 1) return "easy";
+      if (spacesToMove === 2) return "medium";
+      return "advanced";
+    }
+
+    function getNewQuestion(difficulty) {
       const pool = sqlQuestions[difficulty];
       const used = usedQuestions[difficulty];
       const available = pool.filter((q, idx) => !used.has(idx));
@@ -812,167 +923,54 @@
       used.add(originalIndex);
       document.getElementById("question-text").innerText = currentQuestion.question;
       const answerDiv = document.getElementById("answer");
-      answerDiv.innerHTML = "";
+      answerDiv.innerHTML = ""; // Clear the answer field
       answerDiv.focus();
       document.getElementById("question-popup").style.display = "block";
     }
 
-    function submitAnswer() {
-      if (!currentQuestion) {
-        showMessage("No question is currently active.");
-        return;
-      }
-      const userAnswer = document.getElementById("answer").innerText.trim();
-      if (userAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
-        closePopup();
-        if (stickyTiles.has(playerPosition) && stickyAnswersNeeded > 0) {
-          stickyAnswersNeeded--;
-          if (stickyAnswersNeeded === 0) {
-            showMessage("Correct! You have successfully cleared the sticky honey tile. Proceed on your next turn.");
-          } else {
-            showMessage(`Correct! You need ${stickyAnswersNeeded} more correct answer(s) to pass the sticky honey tile.`);
-          }
-        } else {
-          showMessage("Correct! You may now move forward.");
-          movePlayer(spacesToMove);
-        }
-        currentQuestion = null;
-      } else {
-        let feedback = "Incorrect. Please review your query: ";
-        const userLower = userAnswer.toLowerCase();
-        const correctLower = currentQuestion.answer.toLowerCase();
-        if (!userLower.includes("select")) feedback += "A SELECT statement is required. ";
-        if (!userLower.includes("from")) feedback += "A FROM clause is missing. ";
-        if (correctLower.includes("join") && !userLower.includes("join")) feedback += "A JOIN operation is necessary. ";
-        if (correctLower.includes("where") && !userLower.includes("where")) feedback += "A WHERE clause is required. ";
-        if (correctLower.includes("group by") && !userLower.includes("group by")) feedback += "Consider using GROUP BY for aggregation. ";
-        showMessage(feedback);
-      }
-    }
-
-    function showHint() {
-      if (!currentQuestion) {
-        showMessage("There is no active question to provide a hint for.");
-        return;
-      }
-      if (hintsLeft > 0) {
-        const keyCondition = currentQuestion.question.split("'")[1] || "the key condition";
-        showMessage(`Consider using a WHERE clause to filter based on '${keyCondition}'.`);
-        hintsLeft--;
-        document.getElementById("hints-left").innerText = `Hints Left: ${hintsLeft}`;
-      } else {
-        showMessage("You have exhausted all available hints.");
-      }
-    }
-
-    function showDatabaseSchema() {
-      showMessage(
-        "Database Schema:\n\n" +
-        "\u001b[34m=== candy_shops ===\u001b[0m\n" +
-        "shop_id INT PRIMARY KEY\n" +
-        "shop_name VARCHAR(100) NOT NULL\n" +
-        "location VARCHAR(100)\n" +
-        "rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 5)\n\n" +
-        "\u001b[34m=== products ===\u001b[0m\n" +
-        "product_id INT PRIMARY KEY\n" +
-        "product_name VARCHAR(100) NOT NULL\n" +
-        "category VARCHAR(50)\n" +
-        "price DECIMAL(10,2)\n" +
-        "stock_quantity INT\n\n" +
-        "\u001b[34m=== sales ===\u001b[0m\n" +
-        "sale_id INT PRIMARY KEY\n" +
-        "shop_id INT\n" +
-        "product_id INT\n" +
-        "sale_date DATE\n" +
-        "quantity_sold INT\n" +
-        "total_amount DECIMAL(10,2)\n" +
-        "FOREIGN KEY (shop_id) REFERENCES candy_shops(shop_id)\n" +
-        "FOREIGN KEY (product_id) REFERENCES products(product_id)"
-      );
-    }
-
-    function showAnswer() {
-      if (!currentQuestion) {
-        showMessage("There is no active question to show the answer for.");
-        return;
-      }
-      showMessage(`The correct answer is:\n${currentQuestion.answer}`);
+    function showMessage(message) {
+      const popup = document.getElementById("message-popup");
+      const messageText = document.getElementById("message-text");
+      messageText.innerText = message;
+      popup.style.display = "block";
     }
 
     function closePopup() {
       document.getElementById("question-popup").style.display = "none";
-      const answerDiv = document.getElementById("answer");
-      answerDiv.innerHTML = "";
+      currentQuestion = null;
     }
 
     function closeMessagePopup() {
       document.getElementById("message-popup").style.display = "none";
-      const messageText = document.getElementById("message-text");
-      messageText.innerText = "";
     }
 
-    function showMessage(message) {
-      const messageText = document.getElementById("message-text");
-      messageText.innerText = message;
-      document.getElementById("message-popup").style.display = "block";
+    function showFinalPopup() {
+      const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsedSec / 60);
+      const seconds = elapsedSec % 60;
+      document.getElementById("final-message").innerText = `Congratulations! You reached the Candy Castle in ${minutes}m ${seconds}s with ${moveCount} moves!`;
+      document.getElementById("final-popup").style.display = "block";
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      clearInterval(timeInterval);
     }
 
-    function setupSyntaxHighlighting() {
-      const answerDiv = document.getElementById("answer");
-      let selection = null;
+    function closeFinalPopup() {
+      document.getElementById("final-popup").style.display = "none";
+    }
 
-      answerDiv.addEventListener("input", () => {
-        // Save the current selection
-        selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-        const preCaretRange = range.cloneRange();
-        preCaretRange.selectNodeContents(answerDiv);
-        preCaretRange.setEnd(range.endContainer, range.endOffset);
-        const caretOffset = preCaretRange.toString().length;
-
-        // Apply syntax highlighting
-        let text = answerDiv.innerText;
-        text = text.replace(/\b(SELECT|FROM|WHERE|JOIN|GROUP BY|HAVING|ORDER BY|LIMIT)\b/gi, '<span class="sql-keyword">$&</span>');
-        text = text.replace(/'[^']*'/g, '<span class="sql-string">$&</span>');
-        text = text.replace(/\b\d+(\.\d+)?\b/g, '<span class="sql-number">$&</span>');
-        answerDiv.innerHTML = text;
-
-        // Restore the cursor position
-        const newRange = document.createRange();
-        const newSelection = window.getSelection();
-        let currentOffset = 0;
-        let foundNode = null;
-        function traverse(node) {
-          if (node.nodeType === Node.TEXT_NODE) {
-            currentOffset += node.length;
-            if (currentOffset >= caretOffset && !foundNode) {
-              foundNode = node;
-            }
-          } else {
-            for (let child of node.childNodes) {
-              traverse(child);
-            }
-          }
-        }
-        traverse(answerDiv);
-        if (foundNode) {
-          const offsetInNode = caretOffset - (currentOffset - foundNode.length);
-          newRange.setStart(foundNode, offsetInNode);
-          newRange.setEnd(foundNode, offsetInNode);
-          newSelection.removeAllRanges();
-          newSelection.addRange(newRange);
-        }
-
-        // Ensure the cursor is visible
-        answerDiv.scrollTop = answerDiv.scrollHeight;
-      });
-
-      // Prevent default behavior that might interfere with cursor
-      answerDiv.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault(); // Prevent new line for now, or handle it manually if needed
-        }
-      });
+    function submitFinalScore() {
+      const playerName = document.getElementById("player-name").value.trim();
+      if (playerName) {
+        updateScoreboard(playerName);
+        closeFinalPopup();
+        resetPlayer();
+      } else {
+        showMessage("Please enter your name!");
+      }
     }
   </script>
 </body>
