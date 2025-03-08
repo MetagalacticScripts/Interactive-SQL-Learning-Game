@@ -112,6 +112,11 @@
       border: 1px solid #E0E0E0;
       overflow: hidden;
     }
+    @media (min-width: 768px) {
+      .board {
+        overflow-y: auto; /* Keep scrollbar for desktop */
+      }
+    }
     .progress-bar {
       width: clamp(80vw, 90vw, 70vw);
       height: 1.5vh;
@@ -133,6 +138,12 @@
       height: 100%;
       padding: 1vh;
       box-sizing: border-box;
+    }
+    @media (min-width: 768px) {
+      .tiles {
+        grid-template-columns: repeat(5, 1fr); /* 5x4 grid on desktop */
+        grid-template-rows: repeat(4, 1fr);
+      }
     }
     .tile {
       border-radius: 0.5vh;
@@ -173,7 +184,6 @@
       position: absolute;
       transition: left 0.5s ease-in-out, top 0.5s ease-in-out, transform 0.5s ease-out;
       z-index: 10;
-      border: 1px solid rgba(255, 215, 0, 0.3);
     }
     #player.move {
       transform: scale(1.1);
@@ -297,13 +307,14 @@
       }
       .board {
         width: 70vw;
-        height: 80vh; /* Adjusted to fit dynamically */
+        height: 80vh; /* Fixed height with scroll */
       }
       .progress-bar {
         width: 70vw;
       }
       .tiles {
-        /* Dynamic grid will be set via JavaScript */
+        grid-template-columns: repeat(5, 1fr); /* 5x4 grid on desktop */
+        grid-template-rows: repeat(4, 1fr);
       }
       .tile {
         font-size: clamp(2rem, 5vw, 3rem);
@@ -511,7 +522,7 @@
       ]
     };
 
-    function executeQuery(query) {
+    function executeQuery(query, outerRow = null) {
       try {
         const tables = {
           'candy_shops': mockDatabase.candy_shops,
@@ -605,10 +616,60 @@
 
           if (havingMatch) {
             const havingCondition = havingMatch[1].replace(/'([^']+)'/g, (match, p1) => `"${p1}"`);
+            // Handle correlated subquery in HAVING
             result = result.filter(row => {
               try {
+                const subqueryMatch = havingCondition.match(/\(\s*SELECT\s+(.+?)\s+FROM\s+(\w+)\s*(?:JOIN\s+(\w+)\s+ON\s+(.+))?\s*(WHERE\s+(.+))?\s*(GROUP\s+BY\s+(.+))?\)/i);
+                if (subqueryMatch) {
+                  const [, subSelect, subFrom, subJoinTable, subJoinCondition, subWhere, subGroupBy] = subqueryMatch;
+                  let subResult = [...tables[subFrom] || []];
+                  if (subJoinTable && subJoinCondition) {
+                    const [leftCol, rightCol] = subJoinCondition.split('=').map(col => col.trim());
+                    subResult = subResult.flatMap(subRow =>
+                      tables[subJoinTable].filter(joinRow =>
+                        eval(`subRow.${leftCol.split('.')[1]} === joinRow.${rightCol.split('.')[1]}`)
+                      ).map(joinRow => ({ ...subRow, ...joinRow }))
+                    );
+                  }
+                  if (subWhere) {
+                    const subCondition = subWhere.replace(/'([^']+)'/g, (match, p1) => `"${p1}"`).replace(/cs\.shop_id/g, `"${row['shop_id']}"`);
+                    subResult = subResult.filter(subRow => eval(subCondition));
+                  }
+                  if (subGroupBy) {
+                    const subGroupByCols = subGroupBy.split(',').map(col => col.trim().split('.')[1]);
+                    const subGrouped = {};
+                    subResult.forEach(subRow => {
+                      const key = subGroupByCols.map(col => subRow[col]).join('|');
+                      if (!subGrouped[key]) subGrouped[key] = [];
+                      subGrouped[key].push(subRow);
+                    });
+                    subResult = Object.values(subGrouped).map(group => {
+                      const subAggRow = {};
+                      subGroupByCols.forEach(col => subAggRow[col] = group[0][col]);
+                      return subAggRow;
+                    });
+                    const subSelectClause = subSelect.split(',').map(col => col.trim());
+                    subSelectClause.forEach(col => {
+                      const match = col.match(/(\w+)\((.+)\)/);
+                      if (match) {
+                        const aggFunc = match[1].toLowerCase();
+                        const aggCol = match[2].split('.')[1];
+                        let value;
+                        switch (aggFunc) {
+                          case 'avg':
+                            value = subResult.reduce((sum, r) => sum + (r[aggCol] || 0), 0) / subResult.length;
+                            break;
+                        }
+                        return value !== undefined ? value : null;
+                      }
+                    });
+                    const subValue = subResult.length > 0 ? eval(subSelect) : null;
+                    return eval(havingCondition.replace(/\(\s*SELECT\s+(.+?)\s+FROM\s+(\w+)\s*(?:JOIN\s+(\w+)\s+ON\s+(.+))?\s*(WHERE\s+(.+))?\s*(GROUP\s+BY\s+(.+))?\)/i, `"${subValue}"`));
+                  }
+                }
                 return eval(havingCondition);
               } catch (e) {
+                console.error("HAVING evaluation error:", e);
                 return false;
               }
             });
@@ -670,65 +731,7 @@
       }
     }
 
-    function adjustGridLayout() {
-      const tilesContainer = document.getElementById("tiles-container");
-      const board = document.querySelector('.board');
-      const boardHeight = board.clientHeight;
-      const boardWidth = board.clientWidth;
-      const isDesktop = window.innerWidth >= 768;
-      const totalTiles = totalSpaces; // 20 tiles
-
-      if (isDesktop) {
-        // Default: Aim for a 5x4 grid (5 columns, 4 rows)
-        let columns = 5;
-        let rows = Math.ceil(totalTiles / columns); // 4 rows for 20 tiles
-
-        // Estimate tile size (accounting for padding and gaps)
-        const gap = 0.5 * 16; // 0.5vh gap converted to pixels (assuming 16px = 1vh)
-        const padding = 1 * 16; // 1vh padding on each side
-        const availableWidth = boardWidth - 2 * padding;
-        const availableHeight = boardHeight - 2 * padding;
-        let tileWidth = (availableWidth - (columns - 1) * gap) / columns;
-        let tileHeight = (availableHeight - (rows - 1) * gap) / rows;
-
-        // Ensure tiles are square (aspect-ratio: 1 / 1)
-        const tileSize = Math.min(tileWidth, tileHeight);
-
-        // Check if the grid fits within the board height
-        const totalGridHeight = rows * tileSize + (rows - 1) * gap + 2 * padding;
-        const totalGridWidth = columns * tileSize + (columns - 1) * gap + 2 * padding;
-
-        // If the grid is too tall, adjust the number of columns
-        if (totalGridHeight > boardHeight || totalGridWidth > boardWidth) {
-          // Try different column counts until the grid fits
-          for (columns = 4; columns >= 2; columns--) {
-            rows = Math.ceil(totalTiles / columns);
-            tileWidth = (availableWidth - (columns - 1) * gap) / columns;
-            tileHeight = (availableHeight - (rows - 1) * gap) / rows;
-            const tileSize = Math.min(tileWidth, tileHeight);
-            const newGridHeight = rows * tileSize + (rows - 1) * gap + 2 * padding;
-            const newGridWidth = columns * tileSize + (columns - 1) * gap + 2 * padding;
-            if (newGridHeight <= boardHeight && newGridWidth <= boardWidth) {
-              break;
-            }
-          }
-        }
-
-        // Apply the grid layout
-        tilesContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-        tilesContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-      } else {
-        // On mobile, revert to the original auto-fit behavior
-        tilesContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(50px, 1fr))';
-        tilesContainer.style.gridTemplateRows = 'auto';
-      }
-
-      // Regenerate tiles and positions after layout adjustment
-      generateTiles();
-    }
-
     window.onload = () => {
-      adjustGridLayout();
       generateTilePositions();
       generateTiles();
       startTime = Date.now();
@@ -737,7 +740,6 @@
       setupSyntaxHighlighting();
       updateProgress();
       window.addEventListener('resize', () => {
-        adjustGridLayout();
         generateTilePositions();
         placePlayer();
       });
@@ -991,23 +993,28 @@
         return;
       }
 
+      // Display user result and expected result for debugging
+      let message = `Your Query: ${userQuery}\nYour Result:\n`;
+      message += `Columns: ${JSON.stringify(userResult.columns)}\nRows: ${JSON.stringify(userResult.rows)}\n\n`;
+      message += `Expected Result:\nColumns: ${JSON.stringify(correctResult.columns)}\nRows: ${JSON.stringify(correctResult.rows)}`;
+
       const isCorrect = JSON.stringify(userResult) === JSON.stringify(correctResult);
       if (isCorrect) {
         closePopup();
         if (stickyAnswersNeeded > 0) {
           stickyAnswersNeeded--;
           if (stickyAnswersNeeded > 0) {
-            showMessage(`Correct! One more correct answer is required to pass the sticky honey tile. (${stickyAnswersNeeded} left)`);
+            showMessage(`Correct! One more correct answer is required to pass the sticky honey tile. (${stickyAnswersNeeded} left)\n\n${message}`);
             setTimeout(() => getQuestion(currentDifficulty), 1000);
           } else {
-            showMessage("Correct! You have cleared the sticky honey tile. You may proceed on your next turn.");
+            showMessage("Correct! You have cleared the sticky honey tile. You may proceed on your next turn.\n\n" + message);
           }
         } else {
           movePlayer(spacesToMove);
-          showMessage(`Correct! You moved forward ${spacesToMove} space(s)!`);
+          showMessage(`Correct! You moved forward ${spacesToMove} space(s)!\n\n${message}`);
         }
       } else {
-        showMessage("Incorrect answer. Try again or use a hint! Your result doesn't match the expected output.");
+        showMessage(`Incorrect answer. Try again or use a hint!\n\n${message}`);
       }
     }
 
