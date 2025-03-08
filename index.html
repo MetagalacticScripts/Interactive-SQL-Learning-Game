@@ -44,10 +44,10 @@
       margin: 1vh 0;
       color: #4A90E2;
       font-weight: 500;
-      font-size: 5vw;
+      font-size: clamp(1.5rem, 5vw, 2rem);
     }
     .time-display {
-      font-size: 4vw;
+      font-size: clamp(1rem, 4vw, 1.5rem);
       margin: 1vh 0;
       color: #4A90E2;
     }
@@ -67,10 +67,10 @@
     #score-list li {
       padding: 0.5vh 0;
       border-bottom: 1px solid #E0E0E0;
-      font-size: 3vw;
+      font-size: clamp(0.8rem, 3vw, 1.2rem);
     }
     h1 {
-      font-size: 8vw;
+      font-size: clamp(2rem, 8vw, 3rem);
       color: #4A90E2;
       margin: 2vh 0;
       padding: 1vh;
@@ -80,11 +80,11 @@
       background: #4A90E2;
       color: #FFFFFF;
       border: none;
-      padding: 1vh 3vw;
+      padding: clamp(0.5vh, 1vh, 1rem) clamp(1.5vw, 3vw, 2rem);
       margin: 0.5vh;
       border-radius: 0.5vh;
       cursor: pointer;
-      font-size: 3.5vw;
+      font-size: clamp(1rem, 3.5vw, 1.2rem);
       transition: background 0.3s ease, transform 0.2s ease;
       box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
     }
@@ -93,13 +93,13 @@
       transform: scale(1.1);
     }
     #hints-left {
-      font-size: 3.5vw;
+      font-size: clamp(1rem, 3.5vw, 1.2rem);
       color: #4A90E2;
       margin: 0.5vh 0;
     }
     .board {
-      width: 90vw;
-      height: 50vh;
+      width: clamp(80vw, 90vw, 70vw);
+      height: clamp(40vh, 50vh, 60vh);
       background: #FFFFFF;
       margin: 1vh 0;
       border-radius: 1vh;
@@ -109,7 +109,7 @@
       overflow: hidden;
     }
     .progress-bar {
-      width: 90vw;
+      width: clamp(80vw, 90vw, 70vw);
       height: 1.5vh;
       background: #E0E0E0;
       border-radius: 0.5vh;
@@ -123,7 +123,7 @@
     }
     .tiles {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(8vw, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
       gap: 0.5vh;
       width: 100%;
       height: 100%;
@@ -135,7 +135,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 5vw;
+      font-size: clamp(1.5rem, 5vw, 2rem);
       font-weight: bold;
       color: #333;
       box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
@@ -150,22 +150,22 @@
     .start-tile {
       background: #FFD700;
       color: #333;
-      font-size: 4vw;
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
       border: 1px solid rgba(255, 215, 0, 0.5);
     }
     .sticky-tile {
       background: #FFA500;
-      font-size: 6vw;
+      font-size: clamp(1.8rem, 6vw, 2.5rem);
       border: 1px solid rgba(255, 165, 0, 0.5);
     }
     .castle-icon {
-      font-size: 7vw;
+      font-size: clamp(2rem, 7vw, 3rem);
     }
     .active-tile {
       box-shadow: 0 0 1.5vh #4A90E2, 0 0 3vh #357ABD;
     }
     #player {
-      font-size: 8vw;
+      font-size: clamp(2rem, 8vw, 3rem);
       position: absolute;
       transition: left 0.5s ease-in-out, top 0.5s ease-in-out, transform 0.5s ease-out;
       z-index: 10;
@@ -183,7 +183,7 @@
       background: #FFFFFF;
       border-radius: 1vh;
       padding: 2vh;
-      width: 80vw;
+      width: clamp(70vw, 80vw, 50vw);
       max-width: 600px;
       box-shadow: 0 1vh 4vh rgba(0, 0, 0, 0.2);
       z-index: 1000;
@@ -202,7 +202,7 @@
     }
     .popup h2 {
       color: #4A90E2;
-      font-size: 5vw;
+      font-size: clamp(1.5rem, 5vw, 1.5rem);
       margin-bottom: 1vh;
       font-weight: 500;
     }
@@ -213,7 +213,7 @@
       margin: 1vh 0;
       border: 1px solid #E0E0E0;
       border-radius: 0.5vh;
-      font-size: 3vw;
+      font-size: clamp(0.8rem, 3vw, 1rem);
       font-family: 'Courier New', monospace;
       background: #FFFFFF;
       outline: none;
@@ -229,11 +229,11 @@
       background: #4A90E2;
       color: #FFFFFF;
       border: none;
-      padding: 1vh 2vw;
+      padding: clamp(0.5vh, 1vh, 1rem) clamp(1vw, 2vw, 1rem);
       margin: 0.5vh;
       border-radius: 0.5vh;
       cursor: pointer;
-      font-size: 3vw;
+      font-size: clamp(0.8rem, 3vw, 1rem);
       transition: background 0.3s;
     }
     .popup-buttons button:hover {
@@ -245,7 +245,7 @@
       right: 1.5vh;
       background: transparent;
       border: none;
-      font-size: 4vw;
+      font-size: clamp(1rem, 4vw, 1.5rem);
       cursor: pointer;
       color: #888;
       transition: color 0.3s;
@@ -258,13 +258,13 @@
       padding: 1vh 0;
       color: #555;
       white-space: pre-wrap;
-      font-size: 3vw;
+      font-size: clamp(0.8rem, 3vw, 1rem);
     }
     #final-popup .popup-content {
       text-align: center;
     }
     #final-popup .confetti {
-      font-size: 6vw;
+      font-size: clamp(1.5rem, 6vw, 2rem);
       margin-bottom: 1vh;
     }
     #final-popup input {
@@ -273,7 +273,7 @@
       margin: 1vh 0;
       border: 1px solid #E0E0E0;
       border-radius: 0.5vh;
-      font-size: 3vw;
+      font-size: clamp(0.8rem, 3vw, 1rem);
     }
     .sql-keyword {
       color: #0000FF;
@@ -295,25 +295,6 @@
         border-right: 1px solid #E0E0E0;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
       }
-      h2, h3 {
-        font-size: 2rem;
-      }
-      .time-display {
-        font-size: 1.5rem;
-      }
-      #score-list li {
-        font-size: 1.2rem;
-      }
-      h1 {
-        font-size: 3rem;
-      }
-      .character-select button, .controls button {
-        font-size: 1.2rem;
-        padding: 1rem 2rem;
-      }
-      #hints-left {
-        font-size: 1.2rem;
-      }
       .board {
         width: 70vw;
         height: 60vh;
@@ -322,46 +303,7 @@
         width: 70vw;
       }
       .tiles {
-        grid-template-columns: repeat(10, 1fr);
-      }
-      .tile {
-        font-size: 2rem;
-      }
-      .start-tile {
-        font-size: 1.5rem;
-      }
-      .sticky-tile {
-        font-size: 2.5rem;
-      }
-      .castle-icon {
-        font-size: 3rem;
-      }
-      #player {
-        font-size: 3rem;
-      }
-      .popup {
-        width: 50vw;
-      }
-      .popup h2 {
-        font-size: 1.5rem;
-      }
-      #answer {
-        font-size: 1rem;
-      }
-      .popup-buttons button {
-        font-size: 1rem;
-      }
-      .close-button {
-        font-size: 1.5rem;
-      }
-      #message-popup .popup-content p {
-        font-size: 1rem;
-      }
-      #final-popup .confetti {
-        font-size: 2rem;
-      }
-      #final-popup input {
-        font-size: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
       }
     }
   </style>
@@ -967,10 +909,16 @@
 
     function highlightSyntax() {
       const answerDiv = document.getElementById("answer");
-      let text = answerDiv.innerText;
+      const selection = window.getSelection();
+      const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+      let text = answerDiv.innerText || "";
+      let cursorOffset = range ? range.startOffset : text.length;
+
+      // Apply syntax highlighting
       const keywords = /\b(SELECT|FROM|WHERE|JOIN|ON|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|IN|LIKE|BETWEEN|DISTINCT|SUM|AVG|COUNT|MAX|MIN|DATE_SUB|CURDATE|MONTH|YEAR)\b/gi;
       const strings = /('[^']*')/g;
       const numbers = /\b(\d+\.?\d*)\b/g;
+
       text = text
         .replace(/&/g, "&")
         .replace(/</g, "<")
@@ -979,15 +927,45 @@
         .replace(strings, '<span class="sql-string">$1</span>')
         .replace(numbers, '<span class="sql-number">$1</span>')
         .replace(/\n/g, "<br>");
-      const selection = window.getSelection();
-      const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+      // Set the highlighted HTML
       answerDiv.innerHTML = text;
+
+      // Restore cursor position
       if (range) {
         try {
+          const newRange = document.createRange();
+          let node = answerDiv;
+          let offset = cursorOffset;
+          let childNodes = Array.from(answerDiv.childNodes);
+          let charCount = 0;
+
+          for (let i = 0; i < childNodes.length; i++) {
+            const child = childNodes[i];
+            if (child.nodeType === Node.TEXT_NODE) {
+              charCount += child.textContent.length;
+              if (charCount >= offset) {
+                newRange.setStart(child, offset - (charCount - child.textContent.length));
+                break;
+              }
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+              charCount += child.textContent.length;
+              if (charCount >= offset) {
+                newRange.setStart(child.firstChild || child, offset - (charCount - child.textContent.length));
+                break;
+              }
+            }
+          }
+          newRange.collapse(true);
           selection.removeAllRanges();
-          selection.addRange(range);
-        } catch (e) {}
+          selection.addRange(newRange);
+        } catch (e) {
+          console.error("Failed to restore cursor position:", e);
+        }
       }
+
+      // Ensure text direction is LTR
+      answerDiv.style.direction = "ltr";
     }
 
     function closePopup() {
