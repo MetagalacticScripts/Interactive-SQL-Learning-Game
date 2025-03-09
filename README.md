@@ -1,6 +1,7 @@
-# SQL Candy Quest 🍭
+# SQL Candy 🍭
 
-<img width="314" alt="Screenshot 2025-03-08 at 7 13 57 AM" src="https://github.com/user-attachments/assets/bcbaea10-ffcf-45b8-9579-84df302a0dd1" />
+<img width="647" alt="Screenshot 2025-03-09 at 5 57 05 AM" src="https://github.com/user-attachments/assets/bf5b2105-9ee3-4297-8658-a106fd577dc9" />
+
 
 [**Play the Game Now!**](https://metagalacticscripts.github.io/Interactive-SQL-Learning-Game/)
 
