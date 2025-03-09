@@ -1,4 +1,4 @@
-# **SQL Candy 🍭 **  
+# SQL Candy 🍭  
 
 [**Play the Game Now!**](https://metagalacticscripts.github.io/Interactive-SQL-Learning-Game/)  
 
