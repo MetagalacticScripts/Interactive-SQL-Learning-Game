@@ -1,5 +1,7 @@
 # SQL Candy 🍭  
 
+<img width="647" alt="Screenshot 2025-03-09 at 5 57 05 AM" src="https://github.com/user-attachments/assets/6d6955f3-4ca7-40af-9e79-26320d16b324" />
+
 [**Play the Game Now!**](https://metagalacticscripts.github.io/Interactive-SQL-Learning-Game/)  
 
 SQL Candy is an interactive game designed to help you **learn SQL through hands-on practice**. Instead of reading through textbooks or watching videos, you can **write real SQL queries** to navigate through a candy-themed game board. Each game session is unique, keeping the learning experience fresh and engaging.  
